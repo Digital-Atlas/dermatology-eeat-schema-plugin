@@ -1,0 +1,98 @@
+{
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    "name": "Acne at Inverness Dermatology",
+    "description": "Acne vulgaris is a multifactorial chronic inflammatory disease of the pilosebaceous unit. It is characterized by the formation of open and closed comedones, inflammatory papules, pustules, and in severe cases, nodules or cysts. Pathogenesis typically involves follicular hyperkeratosis, hormonal sebaceous gland stimulation, and microbial colonization.",
+    "lastReviewed": "2026-03-07T20:15:14-05:00",
+    "mainEntity": [
+        {
+            "@type": "MedicalCondition",
+            "@id": "https://syoi7gt2xp.wpdns.site/treatment/acne/#condition",
+            "name": "Acne Vulgaris",
+            "relevantSpecialty": {
+                "@type": "MedicalSpecialty",
+                "name": "Dermatology"
+            },
+            "signOrSymptom": [
+                {
+                    "@type": "MedicalSignOrSymptom",
+                    "name": "Comedones"
+                },
+                {
+                    "@type": "MedicalSignOrSymptom",
+                    "name": "inflammatory papules"
+                },
+                {
+                    "@type": "MedicalSignOrSymptom",
+                    "name": "pustules"
+                }
+            ],
+            "sameAs": [],
+            "alternateName": [
+                "Acne Vulgaris",
+                "Acne Scar Treatment",
+                "Pitted Skin Repair",
+                "Acne Crater Revision"
+            ]
+        }
+    ],
+    "reviewedBy": {
+        "@type": "Physician",
+        "name": "M. Shellie Marks, MD, FAAD",
+        "usNPI": "1437367182"
+    },
+    "provider": [
+        {
+            "@type": "Physician",
+            "name": "M. Shellie Marks, MD, FAAD",
+            "url": "https://syoi7gt2xp.wpdns.site/team/m-shellie-marks-md-faad/",
+            "usNPI": "1437367182"
+        },
+        {
+            "@type": "Person",
+            "name": "Mary Beth Templin, PA-C",
+            "url": "https://syoi7gt2xp.wpdns.site/team/mary-beth-templin-pa-c/",
+            "identifier": {
+                "@type": "PropertyValue",
+                "name": "NPI",
+                "value": "1760798961"
+            }
+        },
+        {
+            "@type": "Person",
+            "name": "Marena Windle, PA-C",
+            "url": "https://syoi7gt2xp.wpdns.site/team/marena-windle-pa-c/",
+            "identifier": {
+                "@type": "PropertyValue",
+                "name": "NPI",
+                "value": "1144993023"
+            }
+        },
+        {
+            "@type": "Physician",
+            "name": "Kelsey Kennedy, MD, FAAD",
+            "url": "https://syoi7gt2xp.wpdns.site/team/kelsey-kennedy-md-faad/",
+            "usNPI": "1194222844"
+        },
+        {
+            "@type": "Person",
+            "name": "Kathryn Guilbeau, PA-C",
+            "url": "https://syoi7gt2xp.wpdns.site/team/kathryn-guilbeau-pa-c/",
+            "identifier": {
+                "@type": "PropertyValue",
+                "name": "NPI",
+                "value": "1821725219"
+            }
+        },
+        {
+            "@type": "Person",
+            "name": "Alison Peterson, NP-C",
+            "url": "https://syoi7gt2xp.wpdns.site/team/alison-peterson-np-c/",
+            "identifier": {
+                "@type": "PropertyValue",
+                "name": "NPI",
+                "value": "1225661952"
+            }
+        }
+    ]
+}

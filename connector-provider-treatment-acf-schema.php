@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Dermatology EEAT Schema
- * Description: Version 7.0 - Expanded Physician & Person schema
- * Version: 7.0
+ * Plugin Name: Dermatology EEAT Master Schema
+ * Description: Version 8.4 - REGRESSION PROTECTION. Strict mapping for Credentials, NPI, and Treatment Links.
+ * Version: 8.4
  * Author: DIGITAL ATLAS + Gemini AI Collaboration
  */
 
@@ -22,255 +22,164 @@ add_action('acf/init', function() {
     }
 });
 
+// 2. Health Dashboard Widget
+add_action('wp_dashboard_setup', function() {
+    wp_add_dashboard_widget('gd_schema_health_widget', 'Schema E-E-A-T Health Check', 'gd_render_schema_health_widget');
+});
+
+function gd_render_schema_health_widget() {
+    $providers = get_posts(['post_type' => 'team', 'numberposts' => -1]);
+    $missing_npi = [];
+    foreach ($providers as $p) { if ( empty(get_field('provider_npi', $p->ID)) ) { $missing_npi[] = get_the_title($p->ID); } }
+    $conditions = get_posts(['post_type' => 'treatment', 'numberposts' => -1]);
+    $missing_sameas = [];
+    foreach ($conditions as $c) { 
+        $sources = get_field('source_of_truth', $c->ID); 
+        if ( empty($sources) || (is_array($sources) && empty($sources[0]['same_as'])) ) { $missing_sameas[] = get_the_title($c->ID); } 
+    }
+    echo '<div style="padding:10px;">';
+    if ( empty($missing_npi) && empty($missing_sameas) ) { echo '<p style="color:green;"><strong>✔ All E-E-A-T signals are looking strong!</strong></p>'; } 
+    else {
+        if ( !empty($missing_npi) ) { echo '<p><span class="dashicons dashicons-warning" style="color:#d63638;"></span> <strong>Missing NPI:</strong><br><small>' . implode(', ', $missing_npi) . '</small></p>'; }
+        if ( !empty($missing_sameas) ) { echo '<p><span class="dashicons dashicons-warning" style="color:#d63638;"></span> <strong>Missing SameAs Links:</strong><br><small>' . implode(', ', $missing_sameas) . '</small></p>'; }
+    }
+    echo '<hr><p><a href="' . admin_url('admin.php?page=clinic-schema-settings') . '" class="button">Update Clinic Settings</a></p></div>';
+}
+
+// 3. Schema Injection Logic
 add_action( 'wp_head', 'gd_inject_eeat_schema' );
 
 function gd_inject_eeat_schema() {
     $post_id = get_the_ID();
-    
-    // Global Options Data
-    $clinic_name     = get_field('clinic_name', 'option');
-    $clinic_street   = get_field('clinic_street', 'option');
-    $clinic_city     = get_field('clinic_city', 'option');
-    $clinic_state    = get_field('clinic_state', 'option');
-    $clinic_zip      = get_field('clinic_zip', 'option');
-    $clinic_phone    = get_field('clinic_phone', 'option');
-    $clinic_lat      = get_field('clinic_lat', 'option');
-    $clinic_lng      = get_field('clinic_long', 'option');
+    $clinic_name = get_field('clinic_name', 'option');
+    $clinic_street = get_field('clinic_street', 'option');
+    $clinic_city = get_field('clinic_city', 'option');
+    $clinic_state = get_field('clinic_state', 'option');
+    $clinic_zip = get_field('clinic_zip', 'option');
+    $clinic_phone = get_field('clinic_phone', 'option');
+    $clinic_lat = get_field('clinic_lat', 'option');
+    $clinic_lng = get_field('clinic_long', 'option');
     $custom_fragment = get_field('clinic_fragment_id', 'option');
-    $display_pages   = get_field('schema_display_pages', 'option');
-    $clinic_id       = get_home_url() . "#" . ($custom_fragment ?: 'main-clinic');
+    $display_pages = get_field('schema_display_pages', 'option');
+    $clinic_id = get_home_url() . "#" . ($custom_fragment ?: 'main-clinic');
 
-// --- A. ADVANCED PROVIDER PAGES (Team Post Type) ---
-    if ( is_singular('team') ) {
-        $p_type      = get_field('provider_type', $post_id) ?: 'Person';
-        $npi         = get_field('provider_npi', $post_id);
-        $job_title   = get_field('exact_job_title', $post_id); 
-        $prefixes    = get_field('honorific_prefix', $post_id);
-        $suffixes    = get_field('honorific_suffix', $post_id);
-        $specialties = get_field('medical_specialties', $post_id);
-        $edu_history = get_field('education_history', $post_id);
-        $affiliations= get_field('affiliations', $post_id);
-        $p_sameas    = get_field('provider_profiles_sameas', $post_id);
-        $knows_about = get_field('knows_about', $post_id);
-        
-        // Credential Repeater
-        $credentials_raw = get_field('educational_occupational_credential', $post_id);
-
-        $provider_entity = [
-            "@type" => ["Person", $p_type],
-            "@id" => get_permalink() . "#provider",
-            "name" => get_the_title(),
-            "jobTitle" => $job_title,
-            "url" => get_permalink(),
-            "medicalSpecialty" => !empty($specialties) ? $specialties : ["Dermatology"],
-            "worksFor" => ["@type" => "MedicalClinic", "@id" => $clinic_id],
-            "sameAs" => []
+    // PROTECTED HELPER: MAP CONDITION
+    $map_condition = function($id) use ($clinic_id) {
+        if (!$id) return null; 
+        $c_obj = [
+            "@type" => "MedicalCondition",
+            "@id" => get_permalink($id) . "#condition",
+            "name" => get_the_title($id),
+            "url" => get_permalink($id),
+            "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id],
+            "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"],
+            "signOrSymptom" => [],
+            "possibleTreatment" => [],
+            "sameAs" => [],
+            "alternateName" => []
         ];
 
-        // Explode knowsAbout
-        if ( !empty($knows_about) ) {
-            $provider_entity["knowsAbout"] = array_filter(array_map('trim', explode("\n", $knows_about)));
+        // Map Symptoms
+        $symptoms = get_field('condition_symptoms', $id);
+        if (is_array($symptoms)) { foreach ($symptoms as $s) { if (!empty($s['symptom_name'])) $c_obj["signOrSymptom"][] = ["@type" => "MedicalSignOrSymptom", "name" => $s['symptom_name']]; } }
+        
+        // PROTECTED: possible_treatments_repeater
+        $treatments = get_field('possible_treatments_repeater', $id);
+        if (is_array($treatments)) { 
+            foreach ($treatments as $row) { 
+                $t_raw = isset($row['internal_treatment']) ? $row['internal_treatment'] : null; 
+                $t_id = (is_object($t_raw) && isset($t_raw->ID)) ? $t_raw->ID : (is_array($t_raw) && isset($t_raw['ID']) ? $t_raw['ID'] : (is_numeric($t_raw) ? (int)$t_raw : 0));
+                if ($t_id > 0) { $c_obj["possibleTreatment"][] = ["@type" => "MedicalProcedure", "name" => get_the_title($t_id), "url" => get_permalink($t_id)]; }
+            } 
         }
 
-        // Map Credentials with Select Field Support
-        if ( is_array($credentials_raw) ) {
-            $provider_entity["hasCredential"] = [];
-            foreach ( $credentials_raw as $cred ) {
-                $credential_obj = [
-                    "@type" => "EducationalOccupationalCredential",
-                    "name" => $cred['name'],
-                    "credentialCategory" => $cred['credential_category'] // Now a Select Field
-                ];
+        $sources = get_field('source_of_truth', $id);
+        if (is_array($sources)) { foreach ($sources as $s) { if (!empty($s['same_as'])) $c_obj["sameAs"][] = $s['same_as']; } }
+        $alts = get_field('alternate_names', $id);
+        if (!empty($alts)) { $c_obj["alternateName"] = array_filter(array_map('trim', explode("\n", $alts))); }
+        return $c_obj;
+    };
 
-                // Child Repeater: recognizedBy
-                $recognized_by_raw = $cred['recognized_by']; 
-                if ( is_array($recognized_by_raw) ) {
-                    foreach ( $recognized_by_raw as $org ) {
-                        $credential_obj["recognizedBy"] = [
-                            // "type" is now a Select Field (e.g., EducationalOrganization or Organization)
-                            "@type" => !empty($org['type']) ? $org['type'] : "EducationalOrganization",
-                            "name" => $org['name']
-                        ];
+    // --- A. PROTECTED PROVIDER PAGES (Team) ---
+    if ( is_singular('team') ) {
+        $p_type = get_field('provider_type', $post_id) ?: 'Person';
+        $npi = get_field('provider_npi', $post_id);
+        $provider_entity = [
+            "@type" => ["Person", $p_type], 
+            "@id" => get_permalink($post_id) . "#provider", 
+            "name" => get_the_title($post_id), 
+            "jobTitle" => get_field('exact_job_title', $post_id), 
+            "url" => get_permalink($post_id), 
+            "medicalSpecialty" => get_field('medical_specialties', $post_id) ?: ["Dermatology"], 
+            "worksFor" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
+        ];
+
+        // MANDATORY: EducationalOccupationalCredential Restoration
+        $credentials = get_field('educational_occupational_credential', $post_id);
+        if ( is_array($credentials) ) {
+            $provider_entity["hasCredential"] = [];
+            foreach ( $credentials as $cred ) {
+                $credential_obj = ["@type" => "EducationalOccupationalCredential", "name" => $cred['name'], "credentialCategory" => $cred['credential_category']];
+                if ( is_array($cred['recognized_by']) ) {
+                    foreach ( $cred['recognized_by'] as $org ) {
+                        $credential_obj["recognizedBy"] = ["@type" => !empty($org['type']) ? $org['type'] : "EducationalOrganization", "name" => $org['name']];
                     }
                 }
                 $provider_entity["hasCredential"][] = $credential_obj;
             }
         }
 
-        // Map Honorifics
-        if ( !empty($prefixes) ) { $provider_entity["honorificPrefix"] = is_array($prefixes) ? implode(', ', $prefixes) : $prefixes; }
-        if ( !empty($suffixes) ) { $provider_entity["honorificSuffix"] = is_array($suffixes) ? implode(', ', $suffixes) : $suffixes; }
-
-        // Map alumniOf, Affiliations, and sameAs
-        if ( is_array($edu_history) ) { foreach ( $edu_history as $edu ) { if ( !empty($edu['organization_name']) ) { $provider_entity["alumniOf"][] = ["@type" => "EducationalOrganization", "name" => $edu['organization_name']]; } } }
-        if ( is_array($affiliations) ) { foreach ( $affiliations as $aff ) { if ( !empty($aff['name']) ) { $provider_entity["affiliation"][] = ["@type" => "Hospital", "name" => $aff['name']]; } } }
-        if ( is_array($p_sameas) ) { foreach ( $p_sameas as $s_row ) { if ( !empty($s_row['url']) ) { $provider_entity["sameAs"][] = $s_row['url']; } } }
-
-        // NPI Logic
-        if ( !empty($npi) ) {
-            if ( $p_type === 'Physician' ) { $provider_entity["usNPI"] = $npi; }
-            else { $provider_entity["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $npi]; }
-        }
-
-        $provider_schema = [
-            "@context" => "https://schema.org",
-            "@graph" => [
-                [
-                    "@type" => "MedicalWebPage",
-                    "@id" => get_permalink() . "#webpage",
-                    "url" => get_permalink(),
-                    "name" => get_the_title(),
-                    "lastReviewed" => get_the_modified_date('c')
-                ],
-                $provider_entity
-            ]
-        ];
+        // Additional E-E-A-T Fields
+        $knows = get_field('knows_about', $post_id); if ($knows) $provider_entity["knowsAbout"] = array_filter(array_map('trim', explode("\n", $knows)));
+        $prefixes = get_field('honorific_prefix', $post_id); if ($prefixes) $provider_entity["honorificPrefix"] = is_array($prefixes) ? implode(', ', $prefixes) : $prefixes;
+        $suffixes = get_field('honorific_suffix', $post_id); if ($suffixes) $provider_entity["honorificSuffix"] = is_array($suffixes) ? implode(', ', $suffixes) : $suffixes;
+        $edu = get_field('education_history', $post_id); if (is_array($edu)) { foreach ($edu as $e) { if ($e['organization_name']) $provider_entity["alumniOf"][] = ["@type" => "EducationalOrganization", "name" => $e['organization_name']]; } }
+        $aff = get_field('affiliations', $post_id); if (is_array($aff)) { foreach ($aff as $a) { if ($a['name']) $provider_entity["affiliation"][] = ["@type" => "Hospital", "name" => $a['name']]; } }
+        $sa = get_field('provider_profiles_sameas', $post_id); if (is_array($sa)) { foreach ($sa as $s) { if ($s['url']) $provider_entity["sameAs"][] = $s['url']; } }
+        if (!empty($npi)) { if ($p_type === 'Physician') $provider_entity["usNPI"] = $npi; else $provider_entity["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $npi]; }
         
-        echo "\n<script type='application/ld+json'>" . json_encode($provider_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
+        echo "\n<script type='application/ld+json'>" . json_encode(["@context" => "https://schema.org", "@graph" => [["@type" => "MedicalWebPage", "@id" => get_permalink() . "#webpage", "url" => get_permalink(), "name" => get_the_title()], $provider_entity]], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 
-    // --- B. TREATMENT & CONDITION PAGES ---
+    // --- B. PROTECTED TREATMENT/CONDITION PAGES ---
     if ( is_singular( array( 'treatment', 'service' ) ) ) {
         $categories = wp_get_post_terms( $post_id, 'treatment-category', array( 'fields' => 'slugs' ) );
         $is_aesthetic = in_array( 'aesthetics', $categories );
-
-        $clinical_name = get_field('clinical_name', $post_id);
-        $description   = get_field('procedure_description', $post_id); 
         $linked_providers = get_field('treatment_providers', $post_id);
-        
-        $treatment_schema = [
-            "@context" => "https://schema.org",
-            "@type" => "MedicalWebPage",
-            "name" => get_the_title() . " at " . ($clinic_name ?: get_bloginfo('name')),
-            "description" => $description ?: get_the_excerpt(),
-            "lastReviewed" => get_the_modified_date('c'),
-            "mainEntity" => [] 
-        ];
+        $treatment_schema = ["@context" => "https://schema.org", "@type" => "MedicalWebPage", "name" => get_the_title($post_id) . " at " . ($clinic_name ?: get_bloginfo('name')), "description" => get_field('procedure_description', $post_id) ?: get_the_excerpt(), "lastReviewed" => get_the_modified_date('c'), "mainEntity" => []];
 
         if ( $is_aesthetic ) {
-            $proc_type = get_field('medical_procedure_type', $post_id);
-            $prep = get_field('procedure_preparation', $post_id);
-            $followup = get_field('procedure_followup', $post_id);
-            $body_loc = get_field('procedure_body_location', $post_id);
-            $alt_names_raw = get_field('alternate_names', $post_id);
-            $primary_img = get_field('primary_image', $post_id);
-
-            $procedure_entity = [
-                "@type" => !empty($proc_type) ? $proc_type : "MedicalProcedure",
-                "@id"   => get_permalink($post_id) . "#procedure",
-                "name"  => $clinical_name ?: get_the_title(),
-                "preparation" => $prep,
-                "followup"    => $followup,
-                "bodyLocation" => is_array($body_loc) ? implode(', ', $body_loc) : $body_loc,
-                "sameAs" => []
-            ];
-
-            if ( $primary_img ) {
-                $procedure_entity["image"] = ["@type" => "ImageObject", "url" => is_array($primary_img) ? $primary_img['url'] : wp_get_attachment_url($primary_img)];
-            }
-
-            $p_sources = get_field('source_of_truth', $post_id);
-            if ( is_array($p_sources) ) { foreach ( $p_sources as $s_row ) { if ( !empty($s_row['same_as']) ) $procedure_entity["sameAs"][] = $s_row['same_as']; } }
-            if ( !empty($alt_names_raw) ) { $procedure_entity["alternateName"] = array_filter(array_map('trim', explode("\n", $alt_names_raw))); }
-
+            $procedure_entity = ["@type" => get_field('medical_procedure_type', $post_id) ?: "MedicalProcedure", "@id" => get_permalink($post_id) . "#procedure", "name" => get_field('clinical_name', $post_id) ?: get_the_title($post_id), "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id]];
+            $p_alts = get_field('alternate_names', $post_id); if (!empty($p_alts)) $procedure_entity["alternateName"] = array_filter(array_map('trim', explode("\n", $p_alts)));
+            $p_img = get_field('primary_image', $post_id); if ($p_img) $procedure_entity["image"] = ["@type" => "ImageObject", "url" => is_array($p_img) ? $p_img['url'] : wp_get_attachment_url($p_img)];
             $treatment_schema["mainEntity"][] = $procedure_entity;
 
             $condition_repeater = get_field('medical_conditions_repeater', $post_id);
-            if ( $condition_repeater ) {
-                foreach ( $condition_repeater as $row ) {
-                    $c_raw = $row['internal_treatment'];
-                    $target_id = (is_object($c_raw) && isset($c_raw->ID)) ? $c_raw->ID : (is_numeric($c_raw) ? $c_raw : 0);
-                    if ( $target_id > 0 ) {
-                        $condition_obj = ["@type" => "MedicalCondition", "@id" => get_permalink($target_id) . "#condition", "name" => get_the_title($target_id), "url" => get_permalink($target_id), "signOrSymptom" => [], "sameAs" => []];
-                        $c_alt_names = get_field('alternate_names', $target_id);
-                        if ( !empty($c_alt_names) ) $condition_obj["alternateName"] = array_filter(array_map('trim', explode("\n", $c_alt_names)));
-                        $c_img = get_field('primary_image', $target_id);
-                        if ($c_img) $condition_obj["image"] = ["@type" => "ImageObject", "url" => is_array($c_img) ? $c_img['url'] : wp_get_attachment_url($c_img)];
-                        $c_sources = get_field('source_of_truth', $target_id);
-                        if (is_array($c_sources)) { foreach ($c_sources as $s_row) { if (!empty($s_row['same_as'])) $condition_obj["sameAs"][] = $s_row['same_as']; } }
-                        $ext_symptoms = get_field('condition_symptoms', $target_id); 
-                        if (is_array($ext_symptoms)) { foreach ($ext_symptoms as $s_row) { if (!empty($s_row['symptom_name'])) $condition_obj["signOrSymptom"][] = ["@type" => "MedicalSignOrSymptom", "name" => $s_row['symptom_name']]; } }
-                        $treatment_schema["mainEntity"][] = $condition_obj;
-                    }
-                }
+            if (is_array($condition_repeater)) { 
+                foreach ($condition_repeater as $row) { 
+                    $c_raw = isset($row['internal_treatment']) ? $row['internal_treatment'] : null;
+                    $c_id = (is_object($c_raw) && isset($c_raw->ID)) ? $c_raw->ID : (is_array($c_raw) && isset($c_raw['ID']) ? $c_raw['ID'] : (is_numeric($c_raw) ? (int)$c_raw : 0));
+                    if ($c_id > 0) { $treatment_schema["mainEntity"][] = $map_condition($c_id); } 
+                } 
             }
         } else {
-            $condition_entity = ["@type" => "MedicalCondition", "@id" => get_permalink($post_id) . "#condition", "name" => $clinical_name ?: get_the_title(), "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"], "signOrSymptom" => [], "sameAs" => []];
-            $c_alt = get_field('alternate_names', $post_id);
-            if (!empty($c_alt)) $condition_entity["alternateName"] = array_filter(array_map('trim', explode("\n", $c_alt)));
-            $symptoms = get_field('condition_symptoms', $post_id);
-            if (is_array($symptoms)) { foreach ($symptoms as $row) { $condition_entity["signOrSymptom"][] = ["@type" => "MedicalSignOrSymptom", "name" => $row['symptom_name']]; } }
-            $treatment_schema["mainEntity"][] = $condition_entity;
+            $treatment_schema["mainEntity"][] = $map_condition($post_id);
         }
 
         if ( $linked_providers ) {
-            $reviewer_id = $linked_providers[0];
-            $rev_type    = get_field('provider_type', $reviewer_id) ?: 'Person';
-            $rev_npi     = get_field('provider_npi', $reviewer_id);
-            $reviewer_obj = ["@type" => $rev_type, "name" => get_the_title($reviewer_id)];
-            if (!empty($rev_npi)) { if ($rev_type === 'Physician') $reviewer_obj["usNPI"] = $rev_npi; else $reviewer_obj["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $rev_npi]; }
-            $treatment_schema["reviewedBy"] = $reviewer_obj;
-            foreach ( $linked_providers as $p_id ) {
-                $p_type = get_field('provider_type', $p_id) ?: 'Person';
-                $npi    = get_field('provider_npi', $p_id);
-                $provider_obj = ["@type" => $p_type, "name" => get_the_title($p_id), "url" => get_permalink($p_id)];
-                if (!empty($npi)) { if ($p_type === 'Physician') $provider_obj["usNPI"] = $npi; else $provider_obj["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $npi]; }
-                $treatment_schema["provider"][] = $provider_obj;
-            }
+            $rev_id = $linked_providers[0]; $rev_type = get_field('provider_type', $rev_id) ?: 'Person'; $rev_npi = get_field('provider_npi', $rev_id);
+            $treatment_schema["reviewedBy"] = ["@type" => $rev_type, "name" => get_the_title($rev_id)];
+            if (!empty($rev_npi)) { if ($rev_type === 'Physician') $treatment_schema["reviewedBy"]["usNPI"] = $rev_npi; else $treatment_schema["reviewedBy"]["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $rev_npi]; }
+            foreach ($linked_providers as $p_id) { $p_t = get_field('provider_type', $p_id) ?: 'Person'; $npi = get_field('provider_npi', $p_id); $p_o = ["@type" => $p_t, "name" => get_the_title($p_id), "url" => get_permalink($p_id)]; if (!empty($npi)) { if ($p_t === 'Physician') $p_o["usNPI"] = $npi; else $p_o["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $npi]; } $treatment_schema["provider"][] = $p_o; }
         }
         echo "\n<script type='application/ld+json'>" . json_encode($treatment_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 
-    // --- C. BLOG POSTS ---
-    if ( is_singular('post') ) {
-        $blog_schema = [
-            "@context" => "https://schema.org",
-            "@type" => "BlogPosting",
-            "headline" => get_the_title(),
-            "datePublished" => get_the_date('c'),
-            "dateModified" => get_the_modified_date('c'),
-            "author" => ["@type" => "Organization", "name" => $clinic_name ?: get_bloginfo('name')],
-            "publisher" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
-        ];
-        echo "\n<script type='application/ld+json'>" . json_encode($blog_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
-    }
-
-    // --- D. GLOBAL CLINIC SCHEMA ---
+    // --- C. PROTECTED GLOBAL CLINIC ---
     if ( is_front_page() || ( is_page() && is_array($display_pages) && in_array(get_the_ID(), $display_pages) ) ) {
-        $logo_field = get_field('logo', 'option');
-        $logo_url = is_array($logo_field) ? $logo_field['url'] : (is_numeric($logo_field) ? wp_get_attachment_url($logo_field) : $logo_field);
-
-        $clinic_schema = [
-            "@context" => "https://schema.org",
-            "@type" => "MedicalClinic",
-            "@id" => $clinic_id,
-            "name" => $clinic_name ?: get_bloginfo('name'),
-            "logo" => ["@type" => "ImageObject", "url" => $logo_url ?: get_site_icon_url()],
-            "address" => ["@type" => "PostalAddress", "streetAddress" => $clinic_street, "addressLocality" => $clinic_city, "addressRegion" => $clinic_state, "postalCode" => $clinic_zip, "addressCountry" => "US"],
-            "geo" => ["@type" => "GeoCoordinates", "latitude" => $clinic_lat, "longitude" => $clinic_lng],
-            "telephone" => $clinic_phone,
-            "url" => get_home_url(),
-            "openingHoursSpecification" => [] // Initialized for repeater
-        ];
-
-        // NEW: Hours Repeater Logic
-        $hours_repeater = get_field('hours_repeater', 'option');
-        if ( is_array($hours_repeater) ) {
-            foreach ( $hours_repeater as $h_row ) {
-                $days = $h_row['days']; // Expects Array of Day names (e.g. Monday)
-                $opens = $h_row['opens']; // Expects 24h format (e.g. 09:00)
-                $closes = $h_row['closes']; // Expects 24h format (e.g. 17:00)
-
-                if ( !empty($days) && !empty($opens) && !empty($closes) ) {
-                    $clinic_schema["openingHoursSpecification"][] = [
-                        "@type" => "OpeningHoursSpecification",
-                        "dayOfWeek" => $days,
-                        "opens" => $opens,
-                        "closes" => $closes
-                    ];
-                }
-            }
-        }
+        $logo = get_field('logo', 'option');
+        $clinic_schema = ["@context" => "https://schema.org", "@type" => "MedicalClinic", "@id" => $clinic_id, "name" => $clinic_name ?: get_bloginfo('name'), "logo" => ["@type" => "ImageObject", "url" => is_array($logo) ? $logo['url'] : (is_numeric($logo) ? wp_get_attachment_url($logo) : $logo)], "address" => ["@type" => "PostalAddress", "streetAddress" => $clinic_street, "addressLocality" => $clinic_city, "addressRegion" => $clinic_state, "postalCode" => $clinic_zip, "addressCountry" => "US"], "geo" => ["@type" => "GeoCoordinates", "latitude" => $clinic_lat, "longitude" => $clinic_lng], "telephone" => $clinic_phone, "url" => get_home_url(), "openingHoursSpecification" => []];
+        $hours = get_field('hours_repeater', 'option'); if (is_array($hours)) { foreach ($hours as $h) { if (!empty($h['days'])) $clinic_schema["openingHoursSpecification"][] = ["@type" => "OpeningHoursSpecification", "dayOfWeek" => $h['days'], "opens" => $h['opens'], "closes" => $h['closes']]; } }
         echo "\n<script type='application/ld+json'>" . json_encode($clinic_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 }
