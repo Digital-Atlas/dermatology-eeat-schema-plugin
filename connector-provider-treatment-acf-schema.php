@@ -46,29 +46,63 @@ function gd_inject_eeat_schema() {
             "mainEntity" => []
         ];
 
-        if ( $is_aesthetic ) {
-            $procedure_entity = [
-                "@type" => get_field('medical_procedure_type', $post_id) ?: "MedicalProcedure", 
-                "@id" => get_permalink($post_id) . "#procedure", 
-                "name" => $clinical_name ?: get_the_title($post_id),
-                "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
-            ];
-            $treatment_schema["mainEntity"][] = $procedure_entity;
 
-            $condition_repeater = get_field('medical_conditions_repeater', $post_id);
-            if (is_array($condition_repeater)) { 
-                foreach ($condition_repeater as $row) { 
-                    $c_raw = isset($row['internal_treatment']) ? $row['internal_treatment'] : null;
-                    $c_man = isset($row['internal_treatment_manual']) ? $row['internal_treatment_manual'] : null;
-                    $c_id = (is_object($c_raw)) ? $c_raw->ID : ( !empty($c_raw) ? $c_raw : $c_man );
-                    if ($c_id && is_numeric($c_id)) { 
-                        $c_node = ["@type" => "MedicalCondition", "@id" => get_permalink($c_id) . "#condition", "name" => get_the_title($c_id), "url" => get_permalink($c_id), "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]];
+// --- FORK A: IS_AESTHETIC (Procedure Page) ---
+if ( $is_aesthetic ) {
+    $procedure_entity = [
+        "@type" => get_field('medical_procedure_type', $post_id) ?: "MedicalProcedure", 
+        "@id" => get_permalink($post_id) . "#procedure", 
+        "name" => $clinical_name ?: get_the_title($post_id),
+        "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
+    ];
+    $treatment_schema["mainEntity"][] = $procedure_entity;
+
+    // Targeting the medical_conditions_repeater
+    $condition_repeater = get_field('medical_conditions_repeater', $post_id);
+
+    if (is_array($condition_repeater)) { 
+        foreach ($condition_repeater as $row) { 
+            
+            // 1. Process Post Object (internal_condition)
+            $c_raw = isset($row['internal_condition']) ? $row['internal_condition'] : null;
+            if ( !empty($c_raw) ) {
+                // Normalize to array to handle single ID or multiple objects
+                $c_posts = is_array($c_raw) ? $c_raw : [$c_raw];
+                
+                foreach ($c_posts as $c_item) {
+                    $c_id = (is_object($c_item)) ? $c_item->ID : (is_numeric($c_item) ? $c_item : 0);
+                    
+                    if ($c_id > 0) { 
+                        $c_node = [
+                            "@type" => "MedicalCondition", 
+                            "@id"   => get_permalink($c_id) . "#condition", 
+                            "name"  => get_the_title($c_id), 
+                            "url"   => get_permalink($c_id),
+                            "description" => get_field('condition_description', $c_id) ?: get_the_excerpt($c_id),
+                            "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
+                        ];
+                        
+                        // signOrSymptom logic has been removed here
+
                         $treatment_schema["mainEntity"][] = $c_node; 
-                    } 
-                } 
+                    }
+                }
+            }
+
+            // 2. Process Manual Text Field (internal_condition_manual)
+            $c_manual = isset($row['internal_condition_manual']) ? trim($row['internal_condition_manual']) : '';
+            if ( !empty($c_manual) ) {
+                $treatment_schema["mainEntity"][] = [
+                    "@type" => "MedicalCondition",
+                    "name"  => $c_manual,
+                    "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
+                ];
             }
         } 
+    }
+}            
 
+        
 // --- FORK B: IS_MEDICAL (Condition Page) ---
         elseif ( $is_medical ) {
             // 1. Build the main MedicalCondition entity
