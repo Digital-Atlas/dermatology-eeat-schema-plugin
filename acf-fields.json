@@ -618,12 +618,12 @@
                 "new_lines": ""
             },
             {
-                "key": "field_69ac81b04ddb2",
-                "label": "Codes",
-                "name": "codes",
+                "key": "field_69adef8a39ae8",
+                "label": "Associated Anatomy",
+                "name": "condition_associated_anatomy",
                 "aria-label": "",
-                "type": "repeater",
-                "instructions": "",
+                "type": "textarea",
+                "instructions": "The anatomy of the underlying organ system or structures associated with this entity. If multiple enter line breaks.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -631,103 +631,75 @@
                     "class": "",
                     "id": ""
                 },
-                "layout": "table",
-                "pagination": 0,
-                "min": 0,
-                "max": 0,
-                "collapsed": "",
-                "button_label": "Add New Code",
-                "rows_per_page": 20,
-                "sub_fields": [
-                    {
-                        "key": "field_69ac81c74ddb3",
-                        "label": "ICD-10",
-                        "name": "icd-10",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "Only for medical dermatology",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac81b04ddb2"
-                    },
-                    {
-                        "key": "field_69ac81cf4ddb4",
-                        "label": "SNOMED",
-                        "name": "snowmed",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac81b04ddb2"
-                    },
-                    {
-                        "key": "field_69ac81e04ddb5",
-                        "label": "WikiData",
-                        "name": "wikidata",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac81b04ddb2"
-                    },
-                    {
-                        "key": "field_69ac8867f0318",
-                        "label": "CPT",
-                        "name": "cpt",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "For cosmetic dermatology",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac81b04ddb2"
-                    }
-                ]
+                "default_value": "Skin",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "rows": 4,
+                "placeholder": "",
+                "new_lines": ""
+            },
+            {
+                "key": "field_69adeff539aea",
+                "label": "Differential Diagnosis",
+                "name": "condition_differential_diagnosis",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "It lists conditions with similar symptoms (e.g., \"Rosacea\" or \"Folliculitis\"), demonstrating that the clinic understands the nuance of professional diagnosis.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_69adf02839aeb",
+                "label": "Epidemiology",
+                "name": "condition_epidemiology",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Who is typically affected (e.g., \"Commonly affects adolescents and young adults\") provides demographic context that search engines value for query matching.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_69adefd039ae9",
+                "label": "Risk Factor",
+                "name": "condition_risk_factor",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Listing common risk factors (e.g., \"Hormonal changes\", \"Genetics\") shows a comprehensive understanding of the condition's pathogenesis.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
             },
             {
                 "key": "field_65e1f2a3b4c61",
@@ -817,7 +789,8 @@
                             "SurgicalProcedure": "Surgical Procedure (Mohs, Excision)",
                             "NonInvasiveProcedure": "Non-Invasive (Lasers, CoolSculpting)",
                             "TherapeuticProcedure": "Therapeutic (Peels, Facials)",
-                            "DiagnosticProcedure": "Diagnostic (Biopsy, Exams)"
+                            "DiagnosticProcedure": "Diagnostic (Biopsy, Exams)",
+                            "Drug": "Drug"
                         },
                         "default_value": false,
                         "return_format": "value",
@@ -858,7 +831,7 @@
                         "label": "Internal Treatment Link",
                         "name": "internal_treatment",
                         "aria-label": "",
-                        "type": "relationship",
+                        "type": "post_object",
                         "instructions": "Specify related treatment available at clinic.",
                         "required": 0,
                         "conditional_logic": 0,
@@ -874,16 +847,12 @@
                             "publish"
                         ],
                         "taxonomy": "",
-                        "filters": [
-                            "search",
-                            "post_type"
-                        ],
                         "return_format": "id",
-                        "min": "",
-                        "max": "",
+                        "multiple": 1,
+                        "allow_null": 0,
                         "allow_in_bindings": 0,
-                        "elements": "",
                         "bidirectional": 0,
+                        "ui": 1,
                         "bidirectional_target": [],
                         "parent_repeater": "field_69ac7e33a8419"
                     },
@@ -1187,6 +1156,118 @@
                         "parent_repeater": "field_69accab3c0bde"
                     }
                 ]
+            },
+            {
+                "key": "field_69ac81b04ddb2",
+                "label": "Codes",
+                "name": "codes",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "table",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "",
+                "button_label": "Add New Code",
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_69ac81c74ddb3",
+                        "label": "ICD-10",
+                        "name": "icd-10",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Only for medical dermatology",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_69ac81b04ddb2"
+                    },
+                    {
+                        "key": "field_69ac81cf4ddb4",
+                        "label": "SNOMED",
+                        "name": "snowmed",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_69ac81b04ddb2"
+                    },
+                    {
+                        "key": "field_69ac81e04ddb5",
+                        "label": "WikiData",
+                        "name": "wikidata",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_69ac81b04ddb2"
+                    },
+                    {
+                        "key": "field_69ac8867f0318",
+                        "label": "CPT",
+                        "name": "cpt",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "For cosmetic dermatology",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_69ac81b04ddb2"
+                    }
+                ]
             }
         ],
         "location": [
@@ -1451,9 +1532,9 @@
                     {
                         "key": "field_69ac99312e751",
                         "label": "Internal Medical Condition",
-                        "name": "internal_treatment",
+                        "name": "internal_condition",
                         "aria-label": "",
-                        "type": "relationship",
+                        "type": "post_object",
                         "instructions": "Specify related treatment available at clinic.",
                         "required": 0,
                         "conditional_logic": 0,
@@ -1469,46 +1550,81 @@
                             "publish"
                         ],
                         "taxonomy": "",
-                        "filters": [
-                            "search",
-                            "post_type"
-                        ],
                         "return_format": "id",
-                        "min": "",
-                        "max": "",
+                        "multiple": 1,
+                        "allow_null": 0,
                         "allow_in_bindings": 0,
-                        "elements": "",
                         "bidirectional": 0,
+                        "ui": 1,
                         "bidirectional_target": [],
                         "parent_repeater": "field_69ac993080f76"
                     },
                     {
-                        "key": "field_69ac99312e793",
-                        "label": "Internal Condition Manual",
-                        "name": "internal_treatment_manual",
+                        "key": "field_69adeab2e816b",
+                        "label": "Medical Conditions Listing",
+                        "name": "medical_conditions_listing",
                         "aria-label": "",
-                        "type": "text",
+                        "type": "repeater",
                         "instructions": "",
                         "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac99312e751",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
+                        "conditional_logic": 0,
                         "wrapper": {
                             "width": "",
                             "class": "",
                             "id": ""
                         },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
+                        "layout": "row",
+                        "min": 0,
+                        "max": 4,
+                        "collapsed": "",
+                        "button_label": "Enter Manual Condition",
+                        "rows_per_page": 20,
+                        "sub_fields": [
+                            {
+                                "key": "field_69adeae0e816d",
+                                "label": "Name",
+                                "name": "name",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "allow_in_bindings": 0,
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": "",
+                                "parent_repeater": "field_69adeab2e816b"
+                            },
+                            {
+                                "key": "field_69adeae5e816e",
+                                "label": "Description",
+                                "name": "description",
+                                "aria-label": "",
+                                "type": "textarea",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "allow_in_bindings": 0,
+                                "rows": "",
+                                "placeholder": "",
+                                "new_lines": "",
+                                "parent_repeater": "field_69adeab2e816b"
+                            }
+                        ],
                         "parent_repeater": "field_69ac993080f76"
                     }
                 ]
@@ -1717,8 +1833,8 @@
             },
             {
                 "key": "field_69ac993080fb2",
-                "label": "Procedure Wikidata URL",
-                "name": "procedure_wikidata_url",
+                "label": "Reference",
+                "name": "reference",
                 "aria-label": "",
                 "type": "url",
                 "instructions": "",
