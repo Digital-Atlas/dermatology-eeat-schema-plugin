@@ -1,464 +1,59 @@
 [
     {
-        "key": "group_69a8ff77bac0c",
-        "title": "Clinic Settings",
+        "key": "group_clinic_multi_location_settings",
+        "title": "Clinic Multi-Location EEAT Settings",
         "fields": [
             {
-                "key": "field_69a9d5276807d",
-                "label": "Global Clinic Schema Location",
-                "name": "schema_display_pages",
-                "aria-label": "",
-                "type": "relationship",
-                "instructions": "Default: Front Page - Select additional pages for global schema to appear on.",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "post_type": [
-                    "page"
-                ],
-                "post_status": [
-                    "publish"
-                ],
-                "taxonomy": "",
-                "filters": [
-                    "post_type"
-                ],
-                "return_format": "id",
-                "min": "",
-                "max": "",
-                "allow_in_bindings": 0,
-                "elements": "",
-                "bidirectional": 0,
-                "bidirectional_target": []
-            },
-            {
-                "key": "field_69a900deacc33",
-                "label": "Custom Fragment",
-                "name": "clinic_fragment_id",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "You are telling Google: \"This ID doesn't represent the page itself; it represents the Medical Clinic that exists at this address\". Critical in 2026. Defaults to #main-clinic",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ff78bfe00",
-                "label": "Clinic Name",
-                "name": "clinic_name",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ff8abfe01",
-                "label": "Clinic Street",
-                "name": "clinic_street",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ff90bfe02",
-                "label": "Clinic City",
-                "name": "clinic_city",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ff98bfe03",
-                "label": "Clinic State",
-                "name": "clinic_state",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ff9fbfe04",
-                "label": "Clinic Zip",
-                "name": "clinic_zip",
-                "aria-label": "",
-                "type": "number",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "min": "",
-                "max": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "step": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ffa8bfe05",
-                "label": "Clinic Phone",
-                "name": "clinic_phone",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ffafbfe06",
-                "label": "Clinic Lat",
-                "name": "clinic_lat",
-                "aria-label": "",
-                "type": "number",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "min": "",
-                "max": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "step": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a8ffb7bfe07",
-                "label": "Clinic Long",
-                "name": "clinic_long",
-                "aria-label": "",
-                "type": "number",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "min": "",
-                "max": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "step": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a9eb32cea9a",
-                "label": "Price Range",
-                "name": "",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "Contact for pricing",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
-            },
-            {
-                "key": "field_69a9eb4aec15f",
-                "label": "Logo",
-                "name": "logo",
-                "aria-label": "",
-                "type": "image",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "return_format": "array",
-                "library": "all",
-                "min_width": "",
-                "min_height": "",
-                "min_size": "",
-                "max_width": "",
-                "max_height": "",
-                "max_size": "",
-                "mime_types": "",
-                "allow_in_bindings": 0,
-                "preview_size": "medium"
-            },
-            {
-                "key": "field_69a9eb58ec160",
-                "label": "Clinic Gallery",
-                "name": "clinic_gallery",
-                "aria-label": "",
-                "type": "gallery",
-                "instructions": "Suggested 10-20 images distribute your gallery across exterior, interior, service, team, behind the scenes.",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "return_format": "array",
-                "library": "all",
-                "min": "",
-                "max": "",
-                "min_width": "",
-                "min_height": "",
-                "min_size": "",
-                "max_width": "",
-                "max_height": "",
-                "max_size": "",
-                "mime_types": "",
-                "insert": "append",
-                "preview_size": "medium"
-            },
-            {
-                "key": "field_69a9eb73ec161",
-                "label": "Knows Language",
-                "name": "knows_language",
-                "aria-label": "",
-                "type": "checkbox",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "choices": {
-                    "English": "English",
-                    "Spanish": "Spanish"
-                },
-                "default_value": [],
-                "return_format": "value",
-                "allow_custom": 0,
-                "allow_in_bindings": 0,
-                "layout": "vertical",
-                "toggle": 0,
-                "save_custom": 0,
-                "custom_choice_button_text": "Add new choice"
-            },
-            {
-                "key": "field_69a9ebe9bb6ca",
-                "label": "Hours Repeater",
-                "name": "hours_repeater",
+                "key": "field_clinic_locations_repeater",
+                "label": "Clinic Locations",
+                "name": "clinic_locations",
                 "aria-label": "",
                 "type": "repeater",
                 "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
+                "required": false,
+                "conditional_logic": false,
                 "wrapper": {
                     "width": "",
                     "class": "",
                     "id": ""
                 },
-                "layout": "table",
-                "pagination": 0,
+                "layout": "block",
+                "button_label": "Add New Location",
                 "min": 0,
                 "max": 0,
-                "collapsed": "",
-                "button_label": "Add Row",
                 "rows_per_page": 20,
+                "collapsed": "",
                 "sub_fields": [
                     {
-                        "key": "field_69a9ec2bbb6cb",
-                        "label": "Days",
-                        "name": "days",
+                        "key": "field_is_primary_location",
+                        "label": "Is Primary Location?",
+                        "name": "is_primary",
                         "aria-label": "",
-                        "type": "checkbox",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
+                        "type": "true_false",
+                        "instructions": "Only one location should be marked as Primary. This sets the global @id for Treatments and Providers.",
+                        "required": false,
+                        "conditional_logic": false,
                         "wrapper": {
                             "width": "",
                             "class": "",
                             "id": ""
                         },
-                        "choices": {
-                            "Monday": "Monday",
-                            "Tuesday": "Tuesday",
-                            "Wednesday": "Wednesday",
-                            "Thursday": "Thursday",
-                            "Friday": "Friday",
-                            "Saturday": "Saturday",
-                            "Sunday": "Sunday",
-                            "PublicHolidays": "Public Holidays"
-                        },
-                        "default_value": [],
-                        "return_format": "value",
-                        "allow_custom": 0,
-                        "allow_in_bindings": 0,
-                        "layout": "vertical",
-                        "toggle": 0,
-                        "save_custom": 0,
-                        "custom_choice_button_text": "Add new choice",
-                        "parent_repeater": "field_69a9ebe9bb6ca"
+                        "ui": 1,
+                        "default_value": 0,
+                        "message": "",
+                        "ui_on_text": "",
+                        "ui_off_text": "",
+                        "parent_repeater": "field_clinic_locations_repeater"
                     },
                     {
-                        "key": "field_69a9ec3abb6cc",
-                        "label": "Opens",
-                        "name": "opens",
-                        "aria-label": "",
-                        "type": "time_picker",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "display_format": "g:i a",
-                        "return_format": "H:i",
-                        "allow_in_bindings": 0,
-                        "parent_repeater": "field_69a9ebe9bb6ca"
-                    },
-                    {
-                        "key": "field_69a9ec66bb6cd",
-                        "label": "Closes",
-                        "name": "closes",
-                        "aria-label": "",
-                        "type": "time_picker",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "display_format": "g:i a",
-                        "return_format": "H:i",
-                        "allow_in_bindings": 0,
-                        "parent_repeater": "field_69a9ebe9bb6ca"
-                    }
-                ]
-            },
-            {
-                "key": "field_69ac87d0c33bb",
-                "label": "Insurance Networks",
-                "name": "insurance_networks",
-                "aria-label": "",
-                "type": "repeater",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "layout": "table",
-                "pagination": 0,
-                "min": 0,
-                "max": 0,
-                "collapsed": "",
-                "button_label": "Add Row",
-                "rows_per_page": 20,
-                "sub_fields": [
-                    {
-                        "key": "field_69ac87f5c33bd",
-                        "label": "Network Name",
-                        "name": "network_name",
+                        "key": "field_location_name",
+                        "label": "Location Name",
+                        "name": "location_name",
                         "aria-label": "",
                         "type": "text",
                         "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
+                        "required": 1,
+                        "conditional_logic": false,
                         "wrapper": {
                             "width": "",
                             "class": "",
@@ -466,21 +61,20 @@
                         },
                         "default_value": "",
                         "maxlength": "",
-                        "allow_in_bindings": 0,
                         "placeholder": "",
                         "prepend": "",
                         "append": "",
-                        "parent_repeater": "field_69ac87d0c33bb"
+                        "parent_repeater": "field_clinic_locations_repeater"
                     },
                     {
-                        "key": "field_69ac87fcc33be",
-                        "label": "Payer ID",
-                        "name": "payer_id",
+                        "key": "field_location_fragment",
+                        "label": "Location Fragment ID",
+                        "name": "location_fragment",
                         "aria-label": "",
                         "type": "text",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
+                        "instructions": "e.g., #inverness or #homewood (Used for unique Schema @id)",
+                        "required": 1,
+                        "conditional_logic": false,
                         "wrapper": {
                             "width": "",
                             "class": "",
@@ -488,11 +82,312 @@
                         },
                         "default_value": "",
                         "maxlength": "",
-                        "allow_in_bindings": 0,
                         "placeholder": "",
                         "prepend": "",
                         "append": "",
-                        "parent_repeater": "field_69ac87d0c33bb"
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_pages",
+                        "label": "Display on Pages",
+                        "name": "location_pages",
+                        "aria-label": "",
+                        "type": "relationship",
+                        "instructions": "Select the specific pages where this location's schema should be injected.",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "post_type": [
+                            "page"
+                        ],
+                        "filters": [
+                            "search",
+                            "post_type"
+                        ],
+                        "return_format": "id",
+                        "taxonomy": [],
+                        "min": 0,
+                        "max": 0,
+                        "elements": [],
+                        "bidirectional_target": [],
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_address_group",
+                        "label": "Address Details",
+                        "name": "address",
+                        "aria-label": "",
+                        "type": "group",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "sub_fields": [
+                            {
+                                "key": "f_street",
+                                "label": "Street",
+                                "name": "street",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            },
+                            {
+                                "key": "f_city",
+                                "label": "City",
+                                "name": "city",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            },
+                            {
+                                "key": "f_state",
+                                "label": "State",
+                                "name": "state",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            },
+                            {
+                                "key": "f_zip",
+                                "label": "Zip",
+                                "name": "zip",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            }
+                        ],
+                        "layout": "block",
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_geo",
+                        "label": "Geo Coordinates",
+                        "name": "geo",
+                        "aria-label": "",
+                        "type": "group",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "sub_fields": [
+                            {
+                                "key": "f_lat",
+                                "label": "Latitude",
+                                "name": "lat",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            },
+                            {
+                                "key": "f_long",
+                                "label": "Longitude",
+                                "name": "long",
+                                "aria-label": "",
+                                "type": "text",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "maxlength": "",
+                                "placeholder": "",
+                                "prepend": "",
+                                "append": ""
+                            }
+                        ],
+                        "layout": "block",
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_phone",
+                        "label": "Phone Number",
+                        "name": "phone",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_hours",
+                        "label": "Opening Hours",
+                        "name": "opening_hours",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "min": 0,
+                        "max": 0,
+                        "rows_per_page": 20,
+                        "layout": "table",
+                        "button_label": "Add Row",
+                        "collapsed": "",
+                        "sub_fields": [
+                            {
+                                "key": "f_days",
+                                "label": "Days",
+                                "name": "days",
+                                "aria-label": "",
+                                "type": "select",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "multiple": 1,
+                                "choices": {
+                                    "Monday": "Monday",
+                                    "Tuesday": "Tuesday",
+                                    "Wednesday": "Wednesday",
+                                    "Thursday": "Thursday",
+                                    "Friday": "Friday",
+                                    "Saturday": "Saturday",
+                                    "Sunday": "Sunday"
+                                },
+                                "ui": 1,
+                                "allow_null": 0,
+                                "default_value": [],
+                                "ajax": 0,
+                                "placeholder": "",
+                                "return_format": "value",
+                                "create_options": 0,
+                                "save_options": 0,
+                                "parent_repeater": "field_location_hours"
+                            },
+                            {
+                                "key": "f_opens",
+                                "label": "Opens",
+                                "name": "opens",
+                                "aria-label": "",
+                                "type": "time_picker",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "display_format": "g:i a",
+                                "return_format": "g:i a",
+                                "parent_repeater": "field_location_hours"
+                            },
+                            {
+                                "key": "f_closes",
+                                "label": "Closes",
+                                "name": "closes",
+                                "aria-label": "",
+                                "type": "time_picker",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "display_format": "g:i a",
+                                "return_format": "g:i a",
+                                "parent_repeater": "field_location_hours"
+                            }
+                        ],
+                        "parent_repeater": "field_clinic_locations_repeater"
                     }
                 ]
             }

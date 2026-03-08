@@ -57,8 +57,8 @@ function gd_inject_eeat_schema() {
     // --- FORK: TREATMENT POST TYPE ---
     if ( is_singular( array( 'treatment', 'service' ) ) ) {
         $categories = wp_get_post_terms( $post_id, 'treatment-category', array( 'fields' => 'slugs' ) );
-        $is_aesthetic = in_array( 'aesthetics', $categories );
-        $is_medical   = in_array( 'medical', $categories );
+        $is_procedure = in_array( 'procedure', $categories );
+        $is_condition   = in_array( 'condition', $categories );
         $linked_providers = get_field('treatment_providers', $post_id);
         $clinical_name = get_field('clinical_name', $post_id);
 
@@ -71,8 +71,8 @@ function gd_inject_eeat_schema() {
             "mainEntity" => []
         ];
 
-        // FORK A: AESTHETIC
-        if ( $is_aesthetic ) {
+// --- FORK A: PROCEDURE SCHEMA
+        if ( $is_procedure ) {
             $body_locations = get_field('procedure_body_location', $post_id);
             $procedure_entity = [
                 "@type" => get_field('medical_procedure_type', $post_id) ?: "MedicalProcedure", 
@@ -81,12 +81,23 @@ function gd_inject_eeat_schema() {
                 "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"],
                 "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
             ];
+            
+            // Map bodyLocation
             if ( is_array($body_locations) ) $procedure_entity["bodyLocation"] = $body_locations;
+
+            // RESTORED: Alternate Names logic for Procedure
+            $alts = get_field('alternate_names', $post_id);
+            if (!empty($alts)) { 
+                $procedure_entity["alternateName"] = array_filter(array_map('trim', explode("\n", $alts))); 
+            }
+
             $treatment_schema["mainEntity"][] = $procedure_entity;
 
+            // Process the medical_conditions_repeater
             $condition_repeater = get_field('medical_conditions_repeater', $post_id);
             if (is_array($condition_repeater)) { 
                 foreach ($condition_repeater as $row) { 
+                    // 1. Process Post Object
                     $c_raw = $row['internal_condition'] ?? null;
                     if ( !empty($c_raw) ) {
                         $c_posts = is_array($c_raw) ? $c_raw : [$c_raw];
@@ -100,6 +111,7 @@ function gd_inject_eeat_schema() {
                             }
                         }
                     }
+                    // 2. Process Manual Repeater
                     $manual_listing = $row['medical_conditions_listing'] ?? null;
                     if ( is_array($manual_listing) ) {
                         foreach ( $manual_listing as $m_row ) {
@@ -112,9 +124,9 @@ function gd_inject_eeat_schema() {
                     }
                 } 
             }
-        } 
-        // FORK B: MEDICAL
-        elseif ( $is_medical ) {
+        }
+        // FORK B: CONDITION SCHEMA
+        elseif ( $is_condition ) {
             $raw_anatomy = get_field('condition_associated_anatomy', $post_id);
             $anatomy_list = [];
             if ( !empty($raw_anatomy) ) {
@@ -224,20 +236,45 @@ function gd_inject_eeat_schema() {
     }
 
 
-    // --- SATELLITE / GLOBAL CLINIC INJECTION ---
+// --- SATELLITE / GLOBAL CLINIC INJECTION ---
     if ( $current_page_location ) {
         $loc_id = get_home_url() . ($current_page_location['location_fragment'] ?: '#clinic');
+        
+        // 1. Array-to-String Mapping for Checkbox Labels
+        $specialty_data = $current_page_location['medical_specialty'] ?? null;
+        $mapped_specialties = "Dermatology"; // Default fallback
+
+        if ( is_array($specialty_data) && !empty($specialty_data) ) {
+            // If it's an array, we take all selected labels
+            $mapped_specialties = $specialty_data;
+        } elseif ( !empty($specialty_data) && is_string($specialty_data) ) {
+            // If ACF is forced to return a single string/label
+            $mapped_specialties = $specialty_data;
+        }
+
         $location_schema = [
             "@context" => "https://schema.org",
             "@type" => "MedicalClinic",
             "@id" => $loc_id,
             "name" => $current_page_location['location_name'],
             "telephone" => $current_page_location['phone'],
-            "address" => ["@type" => "PostalAddress", "streetAddress" => $current_page_location['address']['street'], "addressLocality" => $current_page_location['address']['city'], "addressRegion" => $current_page_location['address']['state'], "postalCode" => $current_page_location['address']['zip'], "addressCountry" => "US"],
-            "geo" => ["@type" => "GeoCoordinates", "latitude" => $current_page_location['geo']['lat'], "longitude" => $current_page_location['geo']['long']]
+            "medicalSpecialty" => $mapped_specialties, // Correctly outputs Label string or Array of Labels
+            "address" => [
+                "@type" => "PostalAddress", 
+                "streetAddress" => $current_page_location['address']['street'] ?? '', 
+                "addressLocality" => $current_page_location['address']['city'] ?? '', 
+                "addressRegion" => $current_page_location['address']['state'] ?? '', 
+                "postalCode" => $current_page_location['address']['zip'] ?? '', 
+                "addressCountry" => "US"
+            ],
+            "geo" => [
+                "@type" => "GeoCoordinates", 
+                "latitude" => $current_page_location['geo']['lat'] ?? '', 
+                "longitude" => $current_page_location['geo']['long'] ?? ''
+            ]
         ];
 
-        // ADDED: Link back to Primary if this is a satellite
+        // Link back to Primary if this is a satellite
         if ( empty($current_page_location['is_primary']) && $primary_location ) {
             $location_schema["parentOrganization"] = [
                 "@type" => "MedicalClinic",
@@ -246,9 +283,17 @@ function gd_inject_eeat_schema() {
             ];
         }
 
-        if ( is_array($current_page_location['opening_hours']) ) {
+        // Opening Hours Logic
+        if ( isset($current_page_location['opening_hours']) && is_array($current_page_location['opening_hours']) ) {
             foreach ($current_page_location['opening_hours'] as $h) {
-                if (!empty($h['days'])) $location_schema["openingHoursSpecification"][] = ["@type" => "OpeningHoursSpecification", "dayOfWeek" => $h['days'], "opens" => $h['opens'] ?: "09:00", "closes" => $h['closes'] ?: "17:00"];
+                if (!empty($h['days'])) {
+                    $location_schema["openingHoursSpecification"][] = [
+                        "@type" => "OpeningHoursSpecification", 
+                        "dayOfWeek" => $h['days'], 
+                        "opens" => $h['opens'] ?: "09:00", 
+                        "closes" => $h['closes'] ?: "17:00"
+                    ];
+                }
             }
         }
         echo "\n<script type='application/ld+json'>" . json_encode($location_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
