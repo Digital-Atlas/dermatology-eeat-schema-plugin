@@ -49,62 +49,100 @@ function gd_inject_eeat_schema() {
 
 // --- FORK A: IS_AESTHETIC (Procedure Page) ---
 if ( $is_aesthetic ) {
+    // 1. Map the Body Location from ACF Checkbox as simple strings
+    $body_locations = get_field('procedure_body_location', $post_id);
+    
     $procedure_entity = [
         "@type" => get_field('medical_procedure_type', $post_id) ?: "MedicalProcedure", 
         "@id" => get_permalink($post_id) . "#procedure", 
         "name" => $clinical_name ?: get_the_title($post_id),
+        "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"],
         "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
     ];
+
+    // Only add bodyLocation key if checkboxes are selected
+    // Mapped as an array of strings for Schema.org compliance
+    if ( is_array($body_locations) && ! empty($body_locations) ) {
+        $procedure_entity["bodyLocation"] = $body_locations;
+    }
+
     $treatment_schema["mainEntity"][] = $procedure_entity;
 
-    // Targeting the medical_conditions_repeater
+    // 2. Process the medical_conditions_repeater
     $condition_repeater = get_field('medical_conditions_repeater', $post_id);
 
     if (is_array($condition_repeater)) { 
         foreach ($condition_repeater as $row) { 
             
-            // 1. Process Post Object (internal_condition)
+            // Process Post Object (internal_condition)
             $c_raw = isset($row['internal_condition']) ? $row['internal_condition'] : null;
             if ( !empty($c_raw) ) {
-                // Normalize to array to handle single ID or multiple objects
                 $c_posts = is_array($c_raw) ? $c_raw : [$c_raw];
-                
                 foreach ($c_posts as $c_item) {
                     $c_id = (is_object($c_item)) ? $c_item->ID : (is_numeric($c_item) ? $c_item : 0);
-                    
                     if ($c_id > 0) { 
                         $c_node = [
                             "@type" => "MedicalCondition", 
                             "@id"   => get_permalink($c_id) . "#condition", 
                             "name"  => get_the_title($c_id), 
                             "url"   => get_permalink($c_id),
-                            "description" => get_field('condition_description', $c_id) ?: get_the_excerpt($c_id),
                             "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
                         ];
                         
-                        // signOrSymptom logic has been removed here
+                        $c_desc = get_field('condition_description', $c_id) ?: get_the_excerpt($c_id);
+                        if (!empty($c_desc)) { $c_node["description"] = trim($c_desc); }
 
                         $treatment_schema["mainEntity"][] = $c_node; 
                     }
                 }
             }
 
-            // 2. Process Manual Text Field (internal_condition_manual)
-            $c_manual = isset($row['internal_condition_manual']) ? trim($row['internal_condition_manual']) : '';
-            if ( !empty($c_manual) ) {
-                $treatment_schema["mainEntity"][] = [
-                    "@type" => "MedicalCondition",
-                    "name"  => $c_manual,
-                    "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
-                ];
+            // Process Manual Repeater (medical_conditions_listing)
+            $manual_listing = isset($row['medical_conditions_listing']) ? $row['medical_conditions_listing'] : null;
+            if ( is_array($manual_listing) ) {
+                foreach ( $manual_listing as $m_row ) {
+                    $m_name = isset($m_row['name']) ? trim($m_row['name']) : '';
+                    if ( !empty($m_name) ) {
+                        $m_node = [
+                            "@type" => "MedicalCondition", 
+                            "name" => $m_name, 
+                            "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
+                        ];
+                        if (!empty($m_row['description'])) { $m_node["description"] = trim($m_row['description']); }
+                        
+                        $treatment_schema["mainEntity"][] = $m_node;
+                    }
+                }
             }
         } 
     }
-}            
+}
 
         
 // --- FORK B: IS_MEDICAL (Condition Page) ---
         elseif ( $is_medical ) {
+
+        $raw_anatomy = get_field('condition_associated_anatomy', $post_id);
+            $anatomy_list = [];
+
+            if ( !empty($raw_anatomy) ) {
+                // Split by line break and filter out empty lines
+                $lines = array_filter(array_map('trim', explode("\n", $raw_anatomy)));
+                foreach ($lines as $line) {
+                    $anatomy_list[] = [
+                        "@type" => "AnatomicalStructure",
+                        "name"  => $line
+                    ];
+                }
+            } else {
+                // Default fallback if textarea is empty
+                $anatomy_list[] = [
+                    "@type" => "AnatomicalStructure",
+                    "name"  => "Skin"
+                ];
+            } 
+
+
             // 1. Build the main MedicalCondition entity
             $condition_node = [
                 "@type" => "MedicalCondition",
@@ -112,6 +150,10 @@ if ( $is_aesthetic ) {
                 "name"  => $clinical_name ?: get_the_title($post_id),
                 "url"   => get_permalink($post_id),
                 "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"],
+                "associatedAnatomy" => $anatomy_list, // Now supports multiple anatomical structures
+                "epidemiology" => get_field('condition_epidemiology', $post_id) ?: null,
+                "riskFactor" => get_field('condition_risk_factor', $post_id) ?: null,
+                "differentialDiagnosis" => get_field('condition_differential_diagnosis', $post_id) ?: null,                
                 "signOrSymptom" => [], // Initialized for symptom mapping
                 "possibleTreatment" => [] 
             ];
