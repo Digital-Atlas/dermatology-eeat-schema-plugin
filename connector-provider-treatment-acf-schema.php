@@ -212,7 +212,12 @@ function gd_inject_eeat_schema() {
     if ( $current_page_location ) {
         $loc_id = get_home_url() . ($current_page_location['location_fragment'] ?: '#clinic');
         
-        // 1. Fetch Global Practice Data
+        // 1. Determine Entity Type
+        // Primary = MedicalOrganization (Authority) | Satellite = MedicalClinic (Local Branch)
+        $is_primary_row = !empty($current_page_location['is_primary']);
+        $entity_type = $is_primary_row ? "MedicalOrganization" : "MedicalClinic";
+
+        // 2. Fetch Global Practice Data
         $global_logo = get_field('global_clinic_logo', 'option');
         $global_price = get_field('global_clinic_pricerange', 'option') ?: '$$';
         $global_sameas_raw = get_field('global_clinic_sameas', 'option');
@@ -222,7 +227,7 @@ function gd_inject_eeat_schema() {
 
         $location_schema = [
             "@context" => "https://schema.org",
-            "@type" => "MedicalClinic",
+            "@type" => $entity_type, // Dynamically toggles based on primary status
             "@id" => $loc_id,
             "name" => $current_page_location['location_name'],
             "telephone" => $current_page_location['phone'],
@@ -245,22 +250,18 @@ function gd_inject_eeat_schema() {
             "openingHoursSpecification" => []
         ];
 
-        // 2. Optimized Standard Hours (Collapsed Days Logic)
+        // 3. Optimized Standard Hours (Collapsed Days Logic)
         if ( !empty($current_page_location['opening_hours']) ) {
             foreach ($current_page_location['opening_hours'] as $h) {
-                // ACF multi-select 'days' is already an array. Schema.org accepts this array for dayOfWeek.
                 if ( !empty($h['days']) ) {
                     $spec = [
                         "@type" => "OpeningHoursSpecification", 
-                        "dayOfWeek" => $h['days'] // This creates the "Collapsed" array
+                        "dayOfWeek" => $h['days'] // Collapses Mon-Fri into a flat array
                     ];
-                    
-                    // Logic: If either time is missing, output as Closed
                     if ( empty($h['opens']) || empty($h['closes']) ) {
                         $spec["opens"] = "00:00";
                         $spec["closes"] = "00:00";
                     } else {
-                        // Standardize format to HH:mm for Schema compliance
                         $spec["opens"] = date("H:i", strtotime($h['opens']));
                         $spec["closes"] = date("H:i", strtotime($h['closes']));
                     }
@@ -269,17 +270,12 @@ function gd_inject_eeat_schema() {
             }
         }
 
-        // 3. Public Holidays Logic (Specific Dates)
+        // 4. Public Holidays Logic (Specific Dates / Closed Status)
         $holidays = $current_page_location['public_holidays'] ?? null;
         if ( is_array($holidays) ) {
             foreach ( $holidays as $hol ) {
                 if ( !empty($hol['date']) ) {
-                    $h_spec = [
-                        "@type" => "OpeningHoursSpecification", 
-                        "validFrom" => $hol['date'], 
-                        "validThrough" => $hol['date']
-                    ];
-                    
+                    $h_spec = ["@type" => "OpeningHoursSpecification", "validFrom" => $hol['date'], "validThrough" => $hol['date']];
                     if ( empty($hol['opens']) || empty($hol['closes']) ) {
                         $h_spec["opens"] = "00:00";
                         $h_spec["closes"] = "00:00";
@@ -292,15 +288,15 @@ function gd_inject_eeat_schema() {
             }
         }
 
-        // 4. Global Injections
+        // 5. Global Injections
         if ( !empty($global_logo) ) $location_schema["logo"] = $global_logo;
         if ( !empty($global_sameas) ) $location_schema["sameAs"] = $global_sameas;
         if ( !empty($insurance_list) ) $location_schema["paymentAccepted"] = $insurance_list;
         
-        // 5. Parent Organization Linking
-        if ( empty($current_page_location['is_primary']) && $primary_location ) {
+        // 6. Parent Organization Connection
+        if ( !$is_primary_row && $primary_location ) {
             $location_schema["parentOrganization"] = [
-                "@type" => "MedicalClinic", 
+                "@type" => "MedicalOrganization", 
                 "@id" => $clinic_id, 
                 "name" => $primary_location['location_name']
             ];
