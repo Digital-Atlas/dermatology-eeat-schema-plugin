@@ -1,8 +1,139 @@
 [
     {
         "key": "group_clinic_multi_location_settings",
-        "title": "Clinic Multi-Location EEAT Settings",
+        "title": "Clinic Multi-Location & Global Settings",
         "fields": [
+            {
+                "key": "field_global_schema_tab",
+                "label": "Global Schema Defaults",
+                "name": "",
+                "aria-label": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": false,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "top",
+                "endpoint": 0,
+                "selected": 0
+            },
+            {
+                "key": "field_global_clinic_logo",
+                "label": "Practice Logo",
+                "name": "global_clinic_logo",
+                "aria-label": "",
+                "type": "image",
+                "instructions": "",
+                "required": false,
+                "conditional_logic": false,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "return_format": "url",
+                "preview_size": "medium",
+                "library": "all",
+                "min_width": 0,
+                "min_height": 0,
+                "min_size": 0,
+                "max_width": 0,
+                "max_height": 0,
+                "max_size": 0,
+                "mime_types": ""
+            },
+            {
+                "key": "field_global_clinic_sameas",
+                "label": "Global sameAs Links",
+                "name": "global_clinic_sameas",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "One URL per line.",
+                "required": false,
+                "conditional_logic": false,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "new_lines": "",
+                "maxlength": "",
+                "placeholder": "",
+                "rows": ""
+            },
+            {
+                "key": "field_global_clinic_pricerange",
+                "label": "Price Range",
+                "name": "global_clinic_pricerange",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": false,
+                "conditional_logic": false,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "$": "$ (Affordable)",
+                    "$$": "$$ (Moderate)",
+                    "$$$": "$$$ (Premium)",
+                    "$$$$": "$$$$ (Luxury)"
+                },
+                "default_value": "$$",
+                "multiple": 0,
+                "allow_null": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "return_format": "value",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_global_clinic_insurance",
+                "label": "Accepted Insurance",
+                "name": "global_clinic_insurance",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "One per line.",
+                "required": false,
+                "conditional_logic": false,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "new_lines": "",
+                "maxlength": "",
+                "placeholder": "",
+                "rows": ""
+            },
+            {
+                "key": "field_locations_repeater_tab",
+                "label": "Location Management",
+                "name": "",
+                "aria-label": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": false,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "top",
+                "endpoint": 0,
+                "selected": 0
+            },
             {
                 "key": "field_clinic_locations_repeater",
                 "label": "Clinic Locations",
@@ -18,10 +149,10 @@
                     "id": ""
                 },
                 "layout": "block",
-                "button_label": "Add New Location",
                 "min": 0,
                 "max": 0,
                 "rows_per_page": 20,
+                "button_label": "Add Row",
                 "collapsed": "",
                 "sub_fields": [
                     {
@@ -30,7 +161,7 @@
                         "name": "is_primary",
                         "aria-label": "",
                         "type": "true_false",
-                        "instructions": "Only one location should be marked as Primary. This sets the global @id for Treatments and Providers.",
+                        "instructions": "",
                         "required": false,
                         "conditional_logic": false,
                         "wrapper": {
@@ -72,7 +203,7 @@
                         "name": "location_fragment",
                         "aria-label": "",
                         "type": "text",
-                        "instructions": "e.g., #inverness or #homewood (Used for unique Schema @id)",
+                        "instructions": "",
                         "required": 1,
                         "conditional_logic": false,
                         "wrapper": {
@@ -88,12 +219,12 @@
                         "parent_repeater": "field_clinic_locations_repeater"
                     },
                     {
-                        "key": "field_location_pages",
-                        "label": "Display on Pages",
-                        "name": "location_pages",
+                        "key": "field_is_accepting_patients",
+                        "label": "Accepting New Patients?",
+                        "name": "is_accepting_new_patients",
                         "aria-label": "",
-                        "type": "relationship",
-                        "instructions": "Select the specific pages where this location's schema should be injected.",
+                        "type": "true_false",
+                        "instructions": "",
                         "required": false,
                         "conditional_logic": false,
                         "wrapper": {
@@ -101,19 +232,53 @@
                             "class": "",
                             "id": ""
                         },
-                        "post_type": [
-                            "page"
-                        ],
-                        "filters": [
-                            "search",
-                            "post_type"
-                        ],
-                        "return_format": "id",
-                        "taxonomy": [],
-                        "min": 0,
-                        "max": 0,
-                        "elements": [],
-                        "bidirectional_target": [],
+                        "default_value": 1,
+                        "ui": 1,
+                        "message": "",
+                        "ui_on_text": "",
+                        "ui_off_text": "",
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_area_served",
+                        "label": "Area Served",
+                        "name": "area_served",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "new_lines": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "rows": "",
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_phone",
+                        "label": "Phone Number",
+                        "name": "phone",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
                         "parent_repeater": "field_clinic_locations_repeater"
                     },
                     {
@@ -275,27 +440,6 @@
                         "parent_repeater": "field_clinic_locations_repeater"
                     },
                     {
-                        "key": "field_location_phone",
-                        "label": "Phone Number",
-                        "name": "phone",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
-                        "required": false,
-                        "conditional_logic": false,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_clinic_locations_repeater"
-                    },
-                    {
                         "key": "field_location_hours",
                         "label": "Opening Hours",
                         "name": "opening_hours",
@@ -364,8 +508,8 @@
                                     "class": "",
                                     "id": ""
                                 },
-                                "display_format": "g:i a",
                                 "return_format": "g:i a",
+                                "display_format": "g:i a",
                                 "parent_repeater": "field_location_hours"
                             },
                             {
@@ -382,11 +526,121 @@
                                     "class": "",
                                     "id": ""
                                 },
-                                "display_format": "g:i a",
                                 "return_format": "g:i a",
+                                "display_format": "g:i a",
                                 "parent_repeater": "field_location_hours"
                             }
                         ],
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_public_holidays",
+                        "label": "Public Holiday Hours",
+                        "name": "public_holidays",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "min": 0,
+                        "max": 0,
+                        "rows_per_page": 20,
+                        "layout": "table",
+                        "button_label": "Add Row",
+                        "collapsed": "",
+                        "sub_fields": [
+                            {
+                                "key": "f_holiday_date",
+                                "label": "Date",
+                                "name": "date",
+                                "aria-label": "",
+                                "type": "date_picker",
+                                "instructions": "",
+                                "required": 1,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "return_format": "Y-m-d",
+                                "display_format": "d\/m\/Y",
+                                "first_day": 1,
+                                "default_to_current_date": 0,
+                                "parent_repeater": "field_location_public_holidays"
+                            },
+                            {
+                                "key": "f_holiday_opens",
+                                "label": "Opens",
+                                "name": "opens",
+                                "aria-label": "",
+                                "type": "time_picker",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "return_format": "g:i a",
+                                "display_format": "g:i a",
+                                "parent_repeater": "field_location_public_holidays"
+                            },
+                            {
+                                "key": "f_holiday_closes",
+                                "label": "Closes",
+                                "name": "closes",
+                                "aria-label": "",
+                                "type": "time_picker",
+                                "instructions": "",
+                                "required": false,
+                                "conditional_logic": false,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "return_format": "g:i a",
+                                "display_format": "g:i a",
+                                "parent_repeater": "field_location_public_holidays"
+                            }
+                        ],
+                        "parent_repeater": "field_clinic_locations_repeater"
+                    },
+                    {
+                        "key": "field_location_pages",
+                        "label": "Display on Pages",
+                        "name": "location_pages",
+                        "aria-label": "",
+                        "type": "relationship",
+                        "instructions": "",
+                        "required": false,
+                        "conditional_logic": false,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "post_type": [
+                            "page"
+                        ],
+                        "return_format": "id",
+                        "taxonomy": [],
+                        "min": 0,
+                        "max": 0,
+                        "filters": [
+                            "search",
+                            "post_type",
+                            "taxonomy"
+                        ],
+                        "elements": [],
+                        "bidirectional_target": [],
                         "parent_repeater": "field_clinic_locations_repeater"
                     }
                 ]
@@ -406,10 +660,10 @@
         "style": "default",
         "label_placement": "top",
         "instruction_placement": "label",
-        "hide_on_screen": "",
+        "hide_on_screen": [],
         "active": true,
         "description": "",
-        "show_in_rest": 0,
+        "show_in_rest": false,
         "display_title": ""
     },
     {
@@ -1408,7 +1662,7 @@
                 "name": "medical_conditions_repeater",
                 "aria-label": "",
                 "type": "repeater",
-                "instructions": "List possible treatments, link internally where possible.",
+                "instructions": "List possible treatments, link internally where possible. Manual Conditions can be entered as part of an internal treatment for ease of entry, or separately in the repeater.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -1472,7 +1726,7 @@
                         "min": 0,
                         "max": 4,
                         "collapsed": "",
-                        "button_label": "Enter Manual Condition",
+                        "button_label": "Add Manual Condition",
                         "rows_per_page": 20,
                         "sub_fields": [
                             {
@@ -1849,8 +2103,13 @@
                 },
                 "choices": {
                     "MD": "MD",
+                    "DO": "DO",
                     "FAAD": "FAAD",
-                    "ACMS": "ACMS"
+                    "ACMS": "ACMS",
+                    "FAOCD": "FAOCD",
+                    "FACMS": "FACMS",
+                    "PA-C": "PA-C",
+                    "NP": "NP"
                 },
                 "default_value": [],
                 "return_format": "value",

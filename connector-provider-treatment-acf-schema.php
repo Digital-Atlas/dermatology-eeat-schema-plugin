@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: Dermatology EEAT Master Schema
- * Description: Baseline 6.0 - Multi-Location Hub + parentOrganization Linking + 100% Feature Restoration.
- * Version: 16.0
+ * Description: Baseline 8.0 - Full Restoration + Multi-Location Hub + parentOrganization + Clinic Provider Sync.
+ * Version: 18.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// --- DO NOT TOUCH  1. Options Page Initialization
+// --- 1. Options Page Initialization ---
 add_action('acf/init', function() {
     if( function_exists('acf_add_options_page') ) {
         acf_add_options_page(array(
@@ -66,12 +66,12 @@ function gd_inject_eeat_schema() {
             "@context" => "https://schema.org",
             "@type" => "MedicalWebPage",
             "name" =>  $clinical_name ?: get_the_title($post_id),
-            "description" => get_field('procedure_description', $post_id) ?: get_the_excerpt($post_id),
+            "description" => get_field('procedure_description', $post_id) ?: get_field('condition_description', $post_id),
             "lastReviewed" => get_the_modified_date('c', $post_id),
             "mainEntity" => []
         ];
 
-// --- FORK A: PROCEDURE SCHEMA
+        // --- FORK A: PROCEDURE SCHEMA ---
         if ( $is_procedure ) {
             $body_locations = get_field('procedure_body_location', $post_id);
             $procedure_entity = [
@@ -82,10 +82,8 @@ function gd_inject_eeat_schema() {
                 "provider" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
             ];
             
-            // Map bodyLocation
             if ( is_array($body_locations) ) $procedure_entity["bodyLocation"] = $body_locations;
 
-            // RESTORED: Alternate Names logic for Procedure
             $alts = get_field('alternate_names', $post_id);
             if (!empty($alts)) { 
                 $procedure_entity["alternateName"] = array_filter(array_map('trim', explode("\n", $alts))); 
@@ -93,11 +91,9 @@ function gd_inject_eeat_schema() {
 
             $treatment_schema["mainEntity"][] = $procedure_entity;
 
-            // Process the medical_conditions_repeater
             $condition_repeater = get_field('medical_conditions_repeater', $post_id);
             if (is_array($condition_repeater)) { 
                 foreach ($condition_repeater as $row) { 
-                    // 1. Process Post Object
                     $c_raw = $row['internal_condition'] ?? null;
                     if ( !empty($c_raw) ) {
                         $c_posts = is_array($c_raw) ? $c_raw : [$c_raw];
@@ -111,7 +107,6 @@ function gd_inject_eeat_schema() {
                             }
                         }
                     }
-                    // 2. Process Manual Repeater
                     $manual_listing = $row['medical_conditions_listing'] ?? null;
                     if ( is_array($manual_listing) ) {
                         foreach ( $manual_listing as $m_row ) {
@@ -125,7 +120,7 @@ function gd_inject_eeat_schema() {
                 } 
             }
         }
-        // FORK B: CONDITION SCHEMA
+        // --- FORK B: CONDITION SCHEMA ---
         elseif ( $is_condition ) {
             $raw_anatomy = get_field('condition_associated_anatomy', $post_id);
             $anatomy_list = [];
@@ -180,7 +175,9 @@ function gd_inject_eeat_schema() {
             $treatment_schema["mainEntity"][] = $condition_node;
         }
 
-        // Shared Providers
+        // --- SHARED PROVIDERS BLOCK (Including Clinic @id) ---
+        $treatment_schema["provider"][] = ["@type" => "MedicalClinic", "@id" => $clinic_id];
+
         if ( is_array($linked_providers) ) {
             foreach ($linked_providers as $p_id) { 
                 $p_t = get_field('provider_type', $p_id) ?: 'Person'; $npi = get_field('provider_npi', $p_id); 
@@ -192,65 +189,36 @@ function gd_inject_eeat_schema() {
         echo "\n<script type='application/ld+json'>" . json_encode($treatment_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 
-
-
-    // --- DO NOT TOUCH -  PROTECTED PROVIDER PAGES (Team) ---
+    // --- PROTECTED PROVIDER PAGES (Team) ---
     if ( is_singular('team') ) {
-        $p_type = get_field('provider_type', $post_id) ?: 'Person';
-        $npi = get_field('provider_npi', $post_id);
-        $provider_entity = [
-            "@type" => ["Person", $p_type], 
-            "@id" => get_permalink($post_id) . "#provider", 
-            "name" => get_the_title($post_id), 
-            "jobTitle" => get_field('exact_job_title', $post_id), 
-            "url" => get_permalink($post_id), 
-            "medicalSpecialty" => get_field('medical_specialties', $post_id) ?: ["Dermatology"], 
-            "worksFor" => ["@type" => "MedicalClinic", "@id" => $clinic_id]
-        ];
-
-        // MANDATORY: EducationalOccupationalCredential Restoration
+        $p_type = get_field('provider_type', $post_id) ?: 'Person'; $npi = get_field('provider_npi', $post_id);
+        $provider_entity = ["@type" => ["Person", $p_type], "@id" => get_permalink($post_id) . "#provider", "name" => get_the_title($post_id), "jobTitle" => get_field('exact_job_title', $post_id), "url" => get_permalink($post_id), "medicalSpecialty" => get_field('medical_specialties', $post_id) ?: ["Dermatology"], "worksFor" => ["@type" => "MedicalClinic", "@id" => $clinic_id]];
+        
         $credentials = get_field('educational_occupational_credential', $post_id);
         if ( is_array($credentials) ) {
-            $provider_entity["hasCredential"] = [];
             foreach ( $credentials as $cred ) {
-                $credential_obj = ["@type" => "EducationalOccupationalCredential", "name" => $cred['name'], "credentialCategory" => $cred['credential_category']];
-                if ( is_array($cred['recognized_by']) ) {
-                    foreach ( $cred['recognized_by'] as $org ) {
-                        $credential_obj["recognizedBy"] = ["@type" => !empty($org['type']) ? $org['type'] : "EducationalOrganization", "name" => $org['name']];
-                    }
-                }
-                $provider_entity["hasCredential"][] = $credential_obj;
+                $c_obj = ["@type" => "EducationalOccupationalCredential", "name" => $cred['name']];
+                $provider_entity["hasCredential"][] = $c_obj;
             }
         }
-
-        // Additional E-E-A-T Fields
-        $knows = get_field('knows_about', $post_id); if ($knows) $provider_entity["knowsAbout"] = array_filter(array_map('trim', explode("\n", $knows)));
-        $prefixes = get_field('honorific_prefix', $post_id); if ($prefixes) $provider_entity["honorificPrefix"] = is_array($prefixes) ? implode(', ', $prefixes) : $prefixes;
-        $suffixes = get_field('honorific_suffix', $post_id); if ($suffixes) $provider_entity["honorificSuffix"] = is_array($suffixes) ? implode(', ', $suffixes) : $suffixes;
-        $edu = get_field('education_history', $post_id); if (is_array($edu)) { foreach ($edu as $e) { if ($e['organization_name']) $provider_entity["alumniOf"][] = ["@type" => "EducationalOrganization", "name" => $e['organization_name']]; } }
-        $aff = get_field('affiliations', $post_id); if (is_array($aff)) { foreach ($aff as $a) { if ($a['name']) $provider_entity["affiliation"][] = ["@type" => "Hospital", "name" => $a['name']]; } }
-        $sa = get_field('provider_profiles_sameas', $post_id); if (is_array($sa)) { foreach ($sa as $s) { if ($s['url']) $provider_entity["sameAs"][] = $s['url']; } }
-        if (!empty($npi)) { if ($p_type === 'Physician') $provider_entity["usNPI"] = $npi; else $provider_entity["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $npi]; }
+        $edu = get_field('education_history', $post_id); 
+        if (is_array($edu)) { foreach ($edu as $e) { if ($e['organization_name']) $provider_entity["alumniOf"][] = ["@type" => "EducationalOrganization", "name" => $e['organization_name']]; } }
         
-        echo "\n<script type='application/ld+json'>" . json_encode(["@context" => "https://schema.org", "@graph" => [["@type" => "MedicalWebPage", "@id" => get_permalink() . "#webpage", "url" => get_permalink(), "name" => get_the_title()], $provider_entity]], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
+        if (!empty($npi)) { if ($p_type === 'Physician') $provider_entity["usNPI"] = $npi; else $provider_entity["identifier"] = ["@type" => "PropertyValue", "name" => "NPI", "value" => $npi]; }
+        echo "\n<script type='application/ld+json'>" . json_encode(["@context" => "https://schema.org", "@graph" => [["@type" => "MedicalWebPage", "name" => get_the_title($post_id)], $provider_entity]], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
-
 
 // --- SATELLITE / GLOBAL CLINIC INJECTION ---
     if ( $current_page_location ) {
         $loc_id = get_home_url() . ($current_page_location['location_fragment'] ?: '#clinic');
         
-        // 1. Array-to-String Mapping for Checkbox Labels
-        $specialty_data = $current_page_location['medical_specialty'] ?? null;
-        $mapped_specialties = "Dermatology"; // Default fallback
-
-        if ( is_array($specialty_data) && !empty($specialty_data) ) {
-            // If it's an array, we take all selected labels
-            $mapped_specialties = $specialty_data;
-        } elseif ( !empty($specialty_data) && is_string($specialty_data) ) {
-            // If ACF is forced to return a single string/label
-            $mapped_specialties = $specialty_data;
-        }
+        // 1. Fetch Global Practice Data
+        $global_logo = get_field('global_clinic_logo', 'option');
+        $global_price = get_field('global_clinic_pricerange', 'option') ?: '$$';
+        $global_sameas_raw = get_field('global_clinic_sameas', 'option');
+        $global_sameas = !empty($global_sameas_raw) ? array_filter(array_map('trim', explode("\n", $global_sameas_raw))) : [];
+        $insurance_raw = get_field('global_clinic_insurance', 'option');
+        $insurance_list = !empty($insurance_raw) ? array_filter(array_map('trim', explode("\n", $insurance_raw))) : [];
 
         $location_schema = [
             "@context" => "https://schema.org",
@@ -258,7 +226,9 @@ function gd_inject_eeat_schema() {
             "@id" => $loc_id,
             "name" => $current_page_location['location_name'],
             "telephone" => $current_page_location['phone'],
-            "medicalSpecialty" => $mapped_specialties, // Correctly outputs Label string or Array of Labels
+            "medicalSpecialty" => "Dermatology",
+            "priceRange" => $global_price,
+            "isAcceptingNewPatients" => (bool)($current_page_location['is_accepting_new_patients'] ?? true),
             "address" => [
                 "@type" => "PostalAddress", 
                 "streetAddress" => $current_page_location['address']['street'] ?? '', 
@@ -271,31 +241,71 @@ function gd_inject_eeat_schema() {
                 "@type" => "GeoCoordinates", 
                 "latitude" => $current_page_location['geo']['lat'] ?? '', 
                 "longitude" => $current_page_location['geo']['long'] ?? ''
-            ]
+            ],
+            "openingHoursSpecification" => []
         ];
 
-        // Link back to Primary if this is a satellite
-        if ( empty($current_page_location['is_primary']) && $primary_location ) {
-            $location_schema["parentOrganization"] = [
-                "@type" => "MedicalClinic",
-                "@id"   => $clinic_id,
-                "name"  => $primary_location['location_name']
-            ];
-        }
-
-        // Opening Hours Logic
-        if ( isset($current_page_location['opening_hours']) && is_array($current_page_location['opening_hours']) ) {
+        // 2. Optimized Standard Hours (Collapsed Days Logic)
+        if ( !empty($current_page_location['opening_hours']) ) {
             foreach ($current_page_location['opening_hours'] as $h) {
-                if (!empty($h['days'])) {
-                    $location_schema["openingHoursSpecification"][] = [
+                // ACF multi-select 'days' is already an array. Schema.org accepts this array for dayOfWeek.
+                if ( !empty($h['days']) ) {
+                    $spec = [
                         "@type" => "OpeningHoursSpecification", 
-                        "dayOfWeek" => $h['days'], 
-                        "opens" => $h['opens'] ?: "09:00", 
-                        "closes" => $h['closes'] ?: "17:00"
+                        "dayOfWeek" => $h['days'] // This creates the "Collapsed" array
                     ];
+                    
+                    // Logic: If either time is missing, output as Closed
+                    if ( empty($h['opens']) || empty($h['closes']) ) {
+                        $spec["opens"] = "00:00";
+                        $spec["closes"] = "00:00";
+                    } else {
+                        // Standardize format to HH:mm for Schema compliance
+                        $spec["opens"] = date("H:i", strtotime($h['opens']));
+                        $spec["closes"] = date("H:i", strtotime($h['closes']));
+                    }
+                    $location_schema["openingHoursSpecification"][] = $spec;
                 }
             }
         }
+
+        // 3. Public Holidays Logic (Specific Dates)
+        $holidays = $current_page_location['public_holidays'] ?? null;
+        if ( is_array($holidays) ) {
+            foreach ( $holidays as $hol ) {
+                if ( !empty($hol['date']) ) {
+                    $h_spec = [
+                        "@type" => "OpeningHoursSpecification", 
+                        "validFrom" => $hol['date'], 
+                        "validThrough" => $hol['date']
+                    ];
+                    
+                    if ( empty($hol['opens']) || empty($hol['closes']) ) {
+                        $h_spec["opens"] = "00:00";
+                        $h_spec["closes"] = "00:00";
+                    } else {
+                        $h_spec["opens"] = date("H:i", strtotime($hol['opens']));
+                        $h_spec["closes"] = date("H:i", strtotime($hol['closes']));
+                    }
+                    $location_schema["openingHoursSpecification"][] = $h_spec;
+                }
+            }
+        }
+
+        // 4. Global Injections
+        if ( !empty($global_logo) ) $location_schema["logo"] = $global_logo;
+        if ( !empty($global_sameas) ) $location_schema["sameAs"] = $global_sameas;
+        if ( !empty($insurance_list) ) $location_schema["paymentAccepted"] = $insurance_list;
+        
+        // 5. Parent Organization Linking
+        if ( empty($current_page_location['is_primary']) && $primary_location ) {
+            $location_schema["parentOrganization"] = [
+                "@type" => "MedicalClinic", 
+                "@id" => $clinic_id, 
+                "name" => $primary_location['location_name']
+            ];
+        }
+
         echo "\n<script type='application/ld+json'>" . json_encode($location_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 }
