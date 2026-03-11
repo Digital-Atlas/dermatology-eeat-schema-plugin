@@ -773,7 +773,7 @@
                 "name": "condition_associated_anatomy",
                 "aria-label": "",
                 "type": "textarea",
-                "instructions": "The anatomy of the underlying organ system or structures associated with this entity. If multiple enter line breaks.",
+                "instructions": "The anatomy of the underlying organ system or structures associated with this entity. Enter one per line.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -793,8 +793,8 @@
                 "label": "Differential Diagnosis",
                 "name": "condition_differential_diagnosis",
                 "aria-label": "",
-                "type": "text",
-                "instructions": "It lists conditions with similar symptoms (e.g., \"Rosacea\" or \"Folliculitis\"), demonstrating that the clinic understands the nuance of professional diagnosis.",
+                "type": "textarea",
+                "instructions": "It lists conditions with similar symptoms (e.g., \"Rosacea\" or \"Folliculitis\"), demonstrating that the clinic understands the nuance of professional diagnosis. Enter one per line.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -805,9 +805,9 @@
                 "default_value": "",
                 "maxlength": "",
                 "allow_in_bindings": 0,
+                "rows": 4,
                 "placeholder": "",
-                "prepend": "",
-                "append": ""
+                "new_lines": ""
             },
             {
                 "key": "field_69adf02839aeb",

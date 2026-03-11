@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Dermatology EEAT Master Authority Schema
- * Description: Baseline 2.3 - 100% Feature Retention + Global Entity Type Fix for worksFor.
+ * Description: Wordpress Plugin to generate targeted medical and physician schema
  * Author: DIGITAL ATLAS + GEMINI AI 
  * Version: 2.3
  */
@@ -73,7 +73,7 @@ function gd_inject_eeat_schema() {
             "mainEntity" => []
         ];
 
-        // FORK A: PROCEDURE
+// FORK A: PROCEDURE (Restored Conditions Repeater into mainEntity)
         if ( $is_procedure ) {
             $body_locations = get_field('procedure_body_location', $post_id);
             $procedure_entity = [
@@ -83,12 +83,64 @@ function gd_inject_eeat_schema() {
                 "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"],
                 "provider" => ["@type" => $entity_type, "@id" => $clinic_id]
             ];
+            
+            // Handle Body Locations
             if ( is_array($body_locations) ) $procedure_entity["bodyLocation"] = $body_locations;
+
+            // Handle Alternate Names
             $alts = get_field('alternate_names', $post_id);
             if (!empty($alts)) $procedure_entity["alternateName"] = array_filter(array_map('trim', explode("\n", $alts)));
+            
+            // Restoration: Preparation Instructions
+            $prep = get_field('procedure_preparation', $post_id);
+            if (!empty($prep)) $procedure_entity["preparation"] = $prep;
+
             $treatment_schema["mainEntity"][] = $procedure_entity;
+
+            // --- RESTORED: MEDICAL CONDITIONS REPEATER LOGIC ---
+            $condition_repeater = get_field('medical_conditions_repeater', $post_id);
+            if (is_array($condition_repeater)) { 
+                foreach ($condition_repeater as $row) { 
+                    // 1. Process Post Object (Internal Condition)
+                    $c_raw = $row['internal_condition'] ?? null;
+                    if ( !empty($c_raw) ) {
+                        $c_posts = is_array($c_raw) ? $c_raw : [$c_raw];
+                        foreach ($c_posts as $c_item) {
+                            $c_id = (is_object($c_item)) ? $c_item->ID : (is_numeric($c_item) ? $c_item : 0);
+                            if ($c_id > 0) { 
+                                $c_node = [
+                                    "@type" => "MedicalCondition", 
+                                    "@id" => get_permalink($c_id) . "#condition", 
+                                    "name" => get_the_title($c_id), 
+                                    "url" => get_permalink($c_id), 
+                                    "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
+                                ];
+                                $c_desc = get_field('condition_description', $c_id) ?: get_the_excerpt($c_id);
+                                if (!empty($c_desc)) $c_node["description"] = trim($c_desc);
+                                $treatment_schema["mainEntity"][] = $c_node; 
+                            }
+                        }
+                    }
+                    // 2. Process Manual Repeater (Medical Conditions Listing)
+                    $manual_listing = $row['medical_conditions_listing'] ?? null;
+                    if ( is_array($manual_listing) ) {
+                        foreach ( $manual_listing as $m_row ) {
+                            if ( !empty($m_row['name']) ) {
+                                $m_node = [
+                                    "@type" => "MedicalCondition", 
+                                    "name" => $m_row['name'], 
+                                    "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
+                                ];
+                                if (!empty($m_row['description'])) $m_node["description"] = trim($m_row['description']);
+                                $treatment_schema["mainEntity"][] = $m_node;
+                            }
+                        }
+                    }
+                } 
+            }
         }
 
+        
 // --- FORK B: CONDITION ---
         elseif ( $is_condition ) {
             $raw_anatomy = get_field('condition_associated_anatomy', $post_id);
@@ -101,6 +153,15 @@ function gd_inject_eeat_schema() {
                 $anatomy_list[] = ["@type" => "AnatomicalStructure", "name"  => "Skin"]; 
             }
 
+            // Process Differential Diagnosis Textarea
+            $raw_diff = get_field('condition_differential_diagnosis', $post_id);
+            $diff_list = [];
+            if ( !empty($raw_diff) ) {
+                foreach (array_filter(array_map('trim', explode("\n", $raw_diff))) as $diff_item) {
+                    $diff_list[] = ["@type" => "MedicalCondition", "name" => $diff_item];
+                }
+            }
+
             $condition_node = [
                 "@type" => "MedicalCondition", 
                 "@id" => get_permalink($post_id) . "#condition", 
@@ -110,7 +171,7 @@ function gd_inject_eeat_schema() {
                 "associatedAnatomy" => $anatomy_list, 
                 "epidemiology" => get_field('condition_epidemiology', $post_id) ?: null, 
                 "riskFactor" => get_field('condition_risk_factor', $post_id) ?: null, 
-                "differentialDiagnosis" => get_field('condition_differential_diagnosis', $post_id) ?: null,
+                "differentialDiagnosis" => !empty($diff_list) ? $diff_list : null, // Updated to use list
                 "signOrSymptom" => [],
                 "possibleTreatment" => []
             ];
@@ -173,19 +234,15 @@ function gd_inject_eeat_schema() {
                 $condition_node["reviewedBy"] = ["@type" => get_field('provider_type', $rev_id) ?: 'Person', "name"  => get_the_title($rev_id), "url" => get_permalink($rev_id)];
             }
             $treatment_schema["mainEntity"][] = $condition_node;
-        }        
+        }     
 
-// --- SHARED PROVIDERS BLOCK (Restored Honorifics & worksFor) ---
+// --- SHARED PROVIDERS BLOCK
         $treatment_schema["provider"][] = ["@type" => $entity_type, "@id" => $clinic_id];
 
         if ( is_array($linked_providers) ) {
             foreach ($linked_providers as $p_id) { 
                 $p_t = get_field('provider_type', $p_id) ?: 'Person'; 
                 $npi = get_field('provider_npi', $p_id); 
-                
-                // Explicitly pull honorifics using confirmed ACF names
-                $prefix = get_field('honorific_prefix', $p_id); 
-                $suffix = get_field('honorific_suffix', $p_id); 
 
                 $p_o = [
                     "@type" => $p_t, 
@@ -194,9 +251,6 @@ function gd_inject_eeat_schema() {
                     "worksFor" => ["@type" => $entity_type, "@id" => $clinic_id]
                 ]; 
 
-                // Inject if populated
-                if (!empty($prefix)) $p_o["honorificPrefix"] = $prefix; 
-                if (!empty($suffix)) $p_o["honorificSuffix"] = $suffix;
 
                 if (!empty($npi)) { 
                     if ($p_t === 'Physician') $p_o["usNPI"] = $npi; 
