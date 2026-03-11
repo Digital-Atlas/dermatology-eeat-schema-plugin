@@ -6,6 +6,7 @@
  * Version: 2.3
  */
 
+
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // --- 1. Options Page Initialization ---
@@ -140,8 +141,7 @@ function gd_inject_eeat_schema() {
             }
         }
 
-        
-// --- FORK B: CONDITION ---
+       // --- FORK B: CONDITION ---
         elseif ( $is_condition ) {
             $raw_anatomy = get_field('condition_associated_anatomy', $post_id);
             $anatomy_list = [];
@@ -171,20 +171,35 @@ function gd_inject_eeat_schema() {
                 "associatedAnatomy" => $anatomy_list, 
                 "epidemiology" => get_field('condition_epidemiology', $post_id) ?: null, 
                 "riskFactor" => get_field('condition_risk_factor', $post_id) ?: null, 
-                "differentialDiagnosis" => !empty($diff_list) ? $diff_list : null, // Updated to use list
+                "differentialDiagnosis" => !empty($diff_list) ? $diff_list : null,
                 "signOrSymptom" => [],
+                "cause" => [], // Added for new cause logic
                 "possibleTreatment" => []
             ];
             
-            // 1. Symptoms
-            $symptoms = get_field('condition_symptoms', $post_id);
-            if ( is_array($symptoms) ) { 
-                foreach ($symptoms as $s) { 
-                    if (!empty($s['symptom_name'])) $condition_node["signOrSymptom"][] = ["@type" => "MedicalSignOrSymptom", "name" => $s['symptom_name']]; 
-                } 
+            // 1. Updated Symptoms Logic: Replace repeater with textarea processing
+            $raw_symptoms = get_field('sign_or_symptom', $post_id);
+            if ( !empty($raw_symptoms) ) {
+                foreach (array_filter(array_map('trim', explode("\n", $raw_symptoms))) as $symptom_item) {
+                    $condition_node["signOrSymptom"][] = [
+                        "@type" => "MedicalSignOrSymptom", 
+                        "name" => $symptom_item
+                    ];
+                }
             }
 
-            // 2. Possible Treatments (Relationship with Manual Fallback)
+            // 2. New Cause Logic: Process textarea by line breaks
+            $raw_causes = get_field('cause', $post_id);
+            if ( !empty($raw_causes) ) {
+                foreach (array_filter(array_map('trim', explode("\n", $raw_causes))) as $cause_item) {
+                    $condition_node["cause"][] = [
+                        "@type" => "MedicalCause", 
+                        "name" => $cause_item
+                    ];
+                }
+            }
+
+            // 3. Possible Treatments (Relationship with Manual Fallback)
             $treatments_list = get_field('possible_treatments_repeater', $post_id);
             if ( is_array($treatments_list) ) {
                 foreach ($treatments_list as $t_row) {
@@ -213,7 +228,7 @@ function gd_inject_eeat_schema() {
                 }
             }
 
-            // 3. SameAs (Source of Truth)
+            // 4. SameAs (Source of Truth)
             $sources = get_field('source_of_truth', $post_id);
             if ( is_array($sources) ) { 
                 foreach ($sources as $s) { 
@@ -221,12 +236,13 @@ function gd_inject_eeat_schema() {
                 } 
             }
             
-            // 4. Alternate Names
+            // 5. Alternate Names
             $alts = get_field('alternate_names', $post_id);
             if (!empty($alts)) $condition_node["alternateName"] = array_filter(array_map('trim', explode("\n", $alts)));
 
             // Clean up empty arrays
             if ( empty($condition_node["signOrSymptom"]) ) unset($condition_node["signOrSymptom"]);
+            if ( empty($condition_node["cause"]) ) unset($condition_node["cause"]);
             if ( empty($condition_node["possibleTreatment"]) ) unset($condition_node["possibleTreatment"]);
 
             if ( is_array($linked_providers) && !empty($linked_providers) ) {
@@ -234,7 +250,7 @@ function gd_inject_eeat_schema() {
                 $condition_node["reviewedBy"] = ["@type" => get_field('provider_type', $rev_id) ?: 'Person', "name"  => get_the_title($rev_id), "url" => get_permalink($rev_id)];
             }
             $treatment_schema["mainEntity"][] = $condition_node;
-        }     
+        }
 
 // --- SHARED PROVIDERS BLOCK
         $treatment_schema["provider"][] = ["@type" => $entity_type, "@id" => $clinic_id];
