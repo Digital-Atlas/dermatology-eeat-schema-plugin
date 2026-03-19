@@ -296,6 +296,8 @@
                             "class": "",
                             "id": ""
                         },
+                        "layout": "block",
+                        "parent_repeater": "field_clinic_locations_repeater",
                         "sub_fields": [
                             {
                                 "key": "f_street",
@@ -377,9 +379,7 @@
                                 "prepend": "",
                                 "append": ""
                             }
-                        ],
-                        "layout": "block",
-                        "parent_repeater": "field_clinic_locations_repeater"
+                        ]
                     },
                     {
                         "key": "field_location_geo",
@@ -395,6 +395,8 @@
                             "class": "",
                             "id": ""
                         },
+                        "layout": "block",
+                        "parent_repeater": "field_clinic_locations_repeater",
                         "sub_fields": [
                             {
                                 "key": "f_lat",
@@ -436,9 +438,7 @@
                                 "prepend": "",
                                 "append": ""
                             }
-                        ],
-                        "layout": "block",
-                        "parent_repeater": "field_clinic_locations_repeater"
+                        ]
                     },
                     {
                         "key": "field_location_hours",
@@ -460,6 +460,7 @@
                         "layout": "table",
                         "button_label": "Add Row",
                         "collapsed": "",
+                        "parent_repeater": "field_clinic_locations_repeater",
                         "sub_fields": [
                             {
                                 "key": "f_days",
@@ -531,8 +532,7 @@
                                 "display_format": "g:i a",
                                 "parent_repeater": "field_location_hours"
                             }
-                        ],
-                        "parent_repeater": "field_clinic_locations_repeater"
+                        ]
                     },
                     {
                         "key": "field_location_public_holidays",
@@ -554,6 +554,7 @@
                         "layout": "table",
                         "button_label": "Add Row",
                         "collapsed": "",
+                        "parent_repeater": "field_clinic_locations_repeater",
                         "sub_fields": [
                             {
                                 "key": "f_holiday_date",
@@ -611,8 +612,7 @@
                                 "display_format": "g:i a",
                                 "parent_repeater": "field_location_public_holidays"
                             }
-                        ],
-                        "parent_repeater": "field_clinic_locations_repeater"
+                        ]
                     },
                     {
                         "key": "field_location_pages",
@@ -850,6 +850,41 @@
                 "rows": 4,
                 "placeholder": "",
                 "new_lines": ""
+            },
+            {
+                "key": "field_69bb49af92061",
+                "label": "Differential Diagnosis - Clinical Sub-Types",
+                "name": "sub_types",
+                "aria-label": "",
+                "type": "relationship",
+                "instructions": "References specific sub-types internal in the system,",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": [
+                    "treatment"
+                ],
+                "post_status": [
+                    "publish"
+                ],
+                "taxonomy": [
+                    "treatment-category:medical",
+                    "treatment-category:condition"
+                ],
+                "filters": [
+                    "search"
+                ],
+                "return_format": "id",
+                "min": "",
+                "max": "",
+                "allow_in_bindings": 0,
+                "elements": "",
+                "bidirectional": 0,
+                "bidirectional_target": []
             },
             {
                 "key": "field_69adf02839aeb",
@@ -1414,6 +1449,31 @@
                         "parent_repeater": "field_69ac81b04ddb2"
                     }
                 ]
+            },
+            {
+                "key": "field_69bb4a3c0ca1b",
+                "label": "Parent Condition",
+                "name": "parent_condition",
+                "aria-label": "",
+                "type": "post_object",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "post_type": "",
+                "post_status": "",
+                "taxonomy": "",
+                "return_format": "id",
+                "multiple": 1,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "bidirectional": 0,
+                "ui": 1,
+                "bidirectional_target": []
             }
         ],
         "location": [
@@ -1725,6 +1785,7 @@
                         "collapsed": "",
                         "button_label": "Add Manual Condition",
                         "rows_per_page": 20,
+                        "parent_repeater": "field_69ac993080f76",
                         "sub_fields": [
                             {
                                 "key": "field_69adeae0e816d",
@@ -1770,8 +1831,7 @@
                                 "new_lines": "",
                                 "parent_repeater": "field_69adeab2e816b"
                             }
-                        ],
-                        "parent_repeater": "field_69ac993080f76"
+                        ]
                     }
                 ]
             },
@@ -2270,6 +2330,7 @@
                         "collapsed": "",
                         "button_label": "Add Organization",
                         "rows_per_page": 20,
+                        "parent_repeater": "field_69aceb13fc276",
                         "sub_fields": [
                             {
                                 "key": "field_69aceb86fc27b",
@@ -2342,8 +2403,7 @@
                                 "placeholder": "",
                                 "parent_repeater": "field_69aceb77fc27a"
                             }
-                        ],
-                        "parent_repeater": "field_69aceb13fc276"
+                        ]
                     }
                 ]
             },
