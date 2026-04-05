@@ -726,6 +726,27 @@
                 "append": ""
             },
             {
+                "key": "field_69a9e6cd9511a",
+                "label": "Clinical Description",
+                "name": "condition_description",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "Include a technical description of the condition.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "rows": "",
+                "placeholder": "",
+                "new_lines": ""
+            },
+            {
                 "key": "field_69ab76159c6a2",
                 "label": "Alternate Names",
                 "name": "alternate_names",
@@ -747,12 +768,12 @@
                 "new_lines": ""
             },
             {
-                "key": "field_69a9e6cd9511a",
-                "label": "Condition Description",
-                "name": "condition_description",
+                "key": "field_69adf02839aeb",
+                "label": "Epidemiology",
+                "name": "condition_epidemiology",
                 "aria-label": "",
                 "type": "textarea",
-                "instructions": "Include a technical description of the condition.",
+                "instructions": "Who is typically affected (e.g., \"Commonly affects adolescents and young adults\") provides demographic context that search engines value for query matching.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -768,29 +789,8 @@
                 "new_lines": ""
             },
             {
-                "key": "field_69adef8a39ae8",
-                "label": "Associated Anatomy",
-                "name": "condition_associated_anatomy",
-                "aria-label": "",
-                "type": "textarea",
-                "instructions": "The anatomy of the underlying organ system or structures associated with this entity. Enter one per line.",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "Skin",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "rows": 4,
-                "placeholder": "",
-                "new_lines": ""
-            },
-            {
                 "key": "field_69b1f6590cf5c",
-                "label": "Cause",
+                "label": "Primary Cause(s)",
                 "name": "cause",
                 "aria-label": "",
                 "type": "textarea",
@@ -811,7 +811,7 @@
             },
             {
                 "key": "field_69b1f6620cf5d",
-                "label": "Sign or Symptom",
+                "label": "Manual Symptoms",
                 "name": "sign_or_symptom",
                 "aria-label": "",
                 "type": "textarea",
@@ -887,12 +887,12 @@
                 "bidirectional_target": []
             },
             {
-                "key": "field_69adf02839aeb",
-                "label": "Epidemiology",
-                "name": "condition_epidemiology",
+                "key": "field_69adef8a39ae8",
+                "label": "Associated Anatomy",
+                "name": "condition_associated_anatomy",
                 "aria-label": "",
                 "type": "textarea",
-                "instructions": "Who is typically affected (e.g., \"Commonly affects adolescents and young adults\") provides demographic context that search engines value for query matching.",
+                "instructions": "The anatomy of the underlying organ system or structures associated with this entity. Enter one per line.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -900,37 +900,16 @@
                     "class": "",
                     "id": ""
                 },
-                "default_value": "",
+                "default_value": "Skin",
                 "maxlength": "",
                 "allow_in_bindings": 0,
-                "rows": "",
-                "placeholder": "",
-                "new_lines": ""
-            },
-            {
-                "key": "field_69adefd039ae9",
-                "label": "Risk Factor",
-                "name": "condition_risk_factor",
-                "aria-label": "",
-                "type": "textarea",
-                "instructions": "Listing common risk factors (e.g., \"Hormonal changes\", \"Genetics\") shows a comprehensive understanding of the condition's pathogenesis.",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 0,
-                "rows": "",
+                "rows": 4,
                 "placeholder": "",
                 "new_lines": ""
             },
             {
                 "key": "field_69ac7e33a8419",
-                "label": "Condition Possible Treatments",
+                "label": "Primary Treatments (Internal Objects)",
                 "name": "possible_treatments_repeater",
                 "aria-label": "",
                 "type": "repeater",
@@ -1036,213 +1015,50 @@
                         "ui": 1,
                         "bidirectional_target": [],
                         "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac814e06f49",
-                        "label": "Internal Treatment Manual",
-                        "name": "internal_treatment_manual",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac89d69beb3",
-                        "label": "Body Location",
-                        "name": "body_location",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac930537d1e",
-                        "label": "How Performed",
-                        "name": "how_performed",
-                        "aria-label": "",
-                        "type": "textarea",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "rows": "",
-                        "placeholder": "",
-                        "new_lines": "",
-                        "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac931837d20",
-                        "label": "Preparation",
-                        "name": "preparation",
-                        "aria-label": "",
-                        "type": "textarea",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "rows": "",
-                        "placeholder": "",
-                        "new_lines": "",
-                        "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac930d37d1f",
-                        "label": "Follow Up",
-                        "name": "follow_up",
-                        "aria-label": "",
-                        "type": "textarea",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "rows": "",
-                        "placeholder": "",
-                        "new_lines": "",
-                        "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac93ac37d22",
-                        "label": "Image",
-                        "name": "image",
-                        "aria-label": "",
-                        "type": "image",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "return_format": "array",
-                        "library": "all",
-                        "min_width": "",
-                        "min_height": "",
-                        "min_size": "",
-                        "max_width": "",
-                        "max_height": "",
-                        "max_size": "",
-                        "mime_types": "",
-                        "allow_in_bindings": 0,
-                        "preview_size": "medium",
-                        "parent_repeater": "field_69ac7e33a8419"
-                    },
-                    {
-                        "key": "field_69ac93c437d23",
-                        "label": "Reference",
-                        "name": "reference",
-                        "aria-label": "",
-                        "type": "url",
-                        "instructions": "Property: sameAs. URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
-                        "required": 0,
-                        "conditional_logic": [
-                            [
-                                {
-                                    "field": "field_69ac7e33a8424",
-                                    "operator": "==empty"
-                                }
-                            ]
-                        ],
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "parent_repeater": "field_69ac7e33a8419"
                     }
                 ]
+            },
+            {
+                "key": "field_69caccb69e24f",
+                "label": "Primary Treatments (External Objects)",
+                "name": "primary_treatments_external",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "One per line.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "rows": "",
+                "placeholder": "",
+                "new_lines": ""
+            },
+            {
+                "key": "field_69adefd039ae9",
+                "label": "Risk Factor",
+                "name": "condition_risk_factor",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "Listing common risk factors (e.g., \"Hormonal changes\", \"Genetics\") shows a comprehensive understanding of the condition's pathogenesis.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "rows": "",
+                "placeholder": "",
+                "new_lines": ""
             },
             {
                 "key": "field_69acca16c0bdb",
@@ -1284,57 +1100,6 @@
                         "allow_in_bindings": 0,
                         "placeholder": "",
                         "parent_repeater": "field_69acca16c0bdb"
-                    }
-                ]
-            },
-            {
-                "key": "field_69accab3c0bde",
-                "label": "Condition Images",
-                "name": "condition_images",
-                "aria-label": "",
-                "type": "repeater",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "layout": "table",
-                "pagination": 0,
-                "min": 0,
-                "max": 0,
-                "collapsed": "",
-                "button_label": "Add Row",
-                "rows_per_page": 20,
-                "sub_fields": [
-                    {
-                        "key": "field_69accabfc0be0",
-                        "label": "Image",
-                        "name": "image",
-                        "aria-label": "",
-                        "type": "image",
-                        "instructions": "For conditions, the image should be a clear, clinical representation of the signs or symptoms mentioned in the schema.",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "return_format": "array",
-                        "library": "all",
-                        "min_width": "",
-                        "min_height": "",
-                        "min_size": "",
-                        "max_width": "",
-                        "max_height": "",
-                        "max_size": "",
-                        "mime_types": "png,webp,avif,jpg",
-                        "allow_in_bindings": 0,
-                        "preview_size": "medium",
-                        "parent_repeater": "field_69accab3c0bde"
                     }
                 ]
             },
@@ -1403,14 +1168,38 @@
                         "prepend": "",
                         "append": "",
                         "parent_repeater": "field_69ac81b04ddb2"
-                    },
+                    }
+                ]
+            },
+            {
+                "key": "field_69accab3c0bde",
+                "label": "Condition Images",
+                "name": "condition_images",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "table",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "",
+                "button_label": "Add Row",
+                "rows_per_page": 20,
+                "sub_fields": [
                     {
-                        "key": "field_69ac81e04ddb5",
-                        "label": "WikiData",
-                        "name": "wikidata",
+                        "key": "field_69accabfc0be0",
+                        "label": "Image",
+                        "name": "image",
                         "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
+                        "type": "image",
+                        "instructions": "For conditions, the image should be a clear, clinical representation of the signs or symptoms mentioned in the schema.",
                         "required": 0,
                         "conditional_logic": 0,
                         "wrapper": {
@@ -1418,35 +1207,18 @@
                             "class": "",
                             "id": ""
                         },
-                        "default_value": "",
-                        "maxlength": "",
+                        "return_format": "array",
+                        "library": "all",
+                        "min_width": "",
+                        "min_height": "",
+                        "min_size": "",
+                        "max_width": "",
+                        "max_height": "",
+                        "max_size": "",
+                        "mime_types": "png,webp,avif,jpg",
                         "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac81b04ddb2"
-                    },
-                    {
-                        "key": "field_69ac8867f0318",
-                        "label": "CPT",
-                        "name": "cpt",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "For cosmetic dermatology",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac81b04ddb2"
+                        "preview_size": "medium",
+                        "parent_repeater": "field_69accab3c0bde"
                     }
                 ]
             },
@@ -1486,7 +1258,7 @@
                 {
                     "param": "post_taxonomy",
                     "operator": "==",
-                    "value": "treatment-category:medical"
+                    "value": "treatment-category:condition"
                 }
             ]
         ],
@@ -1565,7 +1337,7 @@
                 "name": "alternate_names",
                 "aria-label": "",
                 "type": "textarea",
-                "instructions": "Format: Ensure text are strings. e.g. \"Acne Car Treatment\" separated by commas.",
+                "instructions": "One per line.",
                 "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -1645,50 +1417,6 @@
                         "prepend": "",
                         "append": "",
                         "parent_repeater": "field_69ac993080ec5"
-                    },
-                    {
-                        "key": "field_69ac99311fd4b",
-                        "label": "WikiData",
-                        "name": "wikidata",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac993080ec5"
-                    },
-                    {
-                        "key": "field_69ac99311fd8a",
-                        "label": "CPT",
-                        "name": "cpt",
-                        "aria-label": "",
-                        "type": "text",
-                        "instructions": "For cosmetic dermatology",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "default_value": "",
-                        "maxlength": "",
-                        "allow_in_bindings": 0,
-                        "placeholder": "",
-                        "prepend": "",
-                        "append": "",
-                        "parent_repeater": "field_69ac993080ec5"
                     }
                 ]
             },
@@ -1715,7 +1443,7 @@
             },
             {
                 "key": "field_69ac993080f76",
-                "label": "Medical Conditions",
+                "label": "Medical Conditions (Internal Objects)",
                 "name": "medical_conditions_repeater",
                 "aria-label": "",
                 "type": "repeater",
@@ -1764,76 +1492,29 @@
                         "ui": 1,
                         "bidirectional_target": [],
                         "parent_repeater": "field_69ac993080f76"
-                    },
-                    {
-                        "key": "field_69adeab2e816b",
-                        "label": "Medical Conditions Listing",
-                        "name": "medical_conditions_listing",
-                        "aria-label": "",
-                        "type": "repeater",
-                        "instructions": "",
-                        "required": 0,
-                        "conditional_logic": 0,
-                        "wrapper": {
-                            "width": "",
-                            "class": "",
-                            "id": ""
-                        },
-                        "layout": "row",
-                        "min": 0,
-                        "max": 4,
-                        "collapsed": "",
-                        "button_label": "Add Manual Condition",
-                        "rows_per_page": 20,
-                        "parent_repeater": "field_69ac993080f76",
-                        "sub_fields": [
-                            {
-                                "key": "field_69adeae0e816d",
-                                "label": "Name",
-                                "name": "name",
-                                "aria-label": "",
-                                "type": "text",
-                                "instructions": "",
-                                "required": 0,
-                                "conditional_logic": 0,
-                                "wrapper": {
-                                    "width": "",
-                                    "class": "",
-                                    "id": ""
-                                },
-                                "default_value": "",
-                                "maxlength": "",
-                                "allow_in_bindings": 0,
-                                "placeholder": "",
-                                "prepend": "",
-                                "append": "",
-                                "parent_repeater": "field_69adeab2e816b"
-                            },
-                            {
-                                "key": "field_69adeae5e816e",
-                                "label": "Description",
-                                "name": "description",
-                                "aria-label": "",
-                                "type": "textarea",
-                                "instructions": "",
-                                "required": 0,
-                                "conditional_logic": 0,
-                                "wrapper": {
-                                    "width": "",
-                                    "class": "",
-                                    "id": ""
-                                },
-                                "default_value": "",
-                                "maxlength": "",
-                                "allow_in_bindings": 0,
-                                "rows": "",
-                                "placeholder": "",
-                                "new_lines": "",
-                                "parent_repeater": "field_69adeab2e816b"
-                            }
-                        ]
                     }
                 ]
+            },
+            {
+                "key": "field_69cab1dc4cdb9",
+                "label": "Medical Conditions (Outside Objects)",
+                "name": "medical_conditions_outside_objects",
+                "aria-label": "",
+                "type": "textarea",
+                "instructions": "List medical conditions that do NOT link to internal condition pages. Enter one per line.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "rows": "",
+                "placeholder": "",
+                "new_lines": ""
             },
             {
                 "key": "field_69ac99308102b",
@@ -2054,6 +1735,27 @@
                 "default_value": "",
                 "allow_in_bindings": 0,
                 "placeholder": ""
+            },
+            {
+                "key": "field_69c983b4b005f",
+                "label": "Legal Status",
+                "name": "legal_status",
+                "aria-label": "",
+                "type": "text",
+                "instructions": "Legal Status (Optional)",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "maxlength": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "prepend": "",
+                "append": ""
             }
         ],
         "location": [
@@ -2066,19 +1768,7 @@
                 {
                     "param": "post_taxonomy",
                     "operator": "==",
-                    "value": "treatment-category:aesthetics"
-                }
-            ],
-            [
-                {
-                    "param": "post_type",
-                    "operator": "==",
-                    "value": "treatment"
-                },
-                {
-                    "param": "post_taxonomy",
-                    "operator": "==",
-                    "value": "treatment-category:mohs-surgery"
+                    "value": "treatment-category:procedure"
                 }
             ]
         ],

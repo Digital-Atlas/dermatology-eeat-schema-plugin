@@ -3,7 +3,7 @@
  * Plugin Name: Dermatology EEAT Master Authority Schema
  * Description: Wordpress Plugin to generate targeted medical and physician schema
  * Author: DIGITAL ATLAS + GEMINI AI 
- * Version: 2.4
+ * Version: 2.6
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -87,8 +87,22 @@ function gd_inject_eeat_schema() {
             $prep = get_field('procedure_preparation', $post_id);
             if (!empty($prep)) $procedure_entity["preparation"] = $prep;
 
+            // NEW: Codes Repeater for Procedures
+            $procedure_codes = get_field('codes', $post_id);
+            if ( is_array($procedure_codes) ) {
+                foreach ( $procedure_codes as $code_row ) {
+                    if ( !empty($code_row['icd-10']) ) {
+                        $procedure_entity["code"][] = ["@type" => "MedicalCode", "codeValue" => trim($code_row['icd-10']), "codingSystem" => "ICD-10-CM"];
+                    }
+                    if ( !empty($code_row['snowmed']) ) {
+                        $procedure_entity["code"][] = ["@type" => "MedicalCode", "codeValue" => trim($code_row['snowmed']), "codingSystem" => "SNOMED-CT"];
+                    }
+                }
+            }
+
             $treatment_schema["mainEntity"][] = $procedure_entity;
 
+            // 1. Process Internal Post Objects (Repeater)
             $condition_repeater = get_field('medical_conditions_repeater', $post_id);
             if (is_array($condition_repeater)) { 
                 foreach ($condition_repeater as $row) { 
@@ -105,21 +119,24 @@ function gd_inject_eeat_schema() {
                             }
                         }
                     }
-                    $manual_listing = $row['medical_conditions_listing'] ?? null;
-                    if ( is_array($manual_listing) ) {
-                        foreach ( $manual_listing as $m_row ) {
-                            if ( !empty($m_row['name']) ) {
-                                $m_node = ["@type" => "MedicalCondition", "name" => $m_row['name'], "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]];
-                                if (!empty($m_row['description'])) $m_node["description"] = trim($m_row['description']);
-                                $treatment_schema["mainEntity"][] = $m_node;
-                            }
-                        }
-                    }
                 } 
+            }
+
+            // 2. Process Manual Text Entries (Textarea)
+            $outside_conditions = get_field('medical_conditions_outside_objects', $post_id);
+            if ( !empty($outside_conditions) ) {
+                $manual_conditions = array_filter(array_map('trim', explode("\n", $outside_conditions)));
+                foreach ( $manual_conditions as $m_name ) {
+                    $treatment_schema["mainEntity"][] = [
+                        "@type" => "MedicalCondition", 
+                        "name" => $m_name, 
+                        "relevantSpecialty" => ["@type" => "MedicalSpecialty", "name" => "Dermatology"]
+                    ];
+                }
             }
         }
 
-       // --- FORK B: CONDITION (Updated with Dynamic Relational Sub-Types) ---
+       // --- FORK B: CONDITION ---
         elseif ( $is_condition ) {
             $raw_anatomy = get_field('condition_associated_anatomy', $post_id);
             $anatomy_list = [];
@@ -153,14 +170,14 @@ function gd_inject_eeat_schema() {
                     if ( is_array($child_codes) ) {
                         foreach ( $child_codes as $code_row ) {
                             if ( !empty($code_row['icd-10']) ) {
-                                $sub_node["code"][] = [
-                                    "@type" => "MedicalCode",
-                                    "codeValue" => $code_row['icd-10'],
-                                    "codingSystem" => "ICD-10-CM"
-                                ];
+                                $sub_node["code"][] = ["@type" => "MedicalCode", "codeValue" => trim($code_row['icd-10']), "codingSystem" => "ICD-10-CM"];
+                            }
+                            if ( !empty($code_row['snowmed']) ) {
+                                $sub_node["code"][] = ["@type" => "MedicalCode", "codeValue" => trim($code_row['snowmed']), "codingSystem" => "SNOMED-CT"];
                             }
                         }
                     }
+                    if ( empty($sub_node["code"]) ) unset($sub_node["code"]);
                     $diff_list[] = $sub_node;
                 }
             }
@@ -179,6 +196,19 @@ function gd_inject_eeat_schema() {
                 "cause" => [],
                 "possibleTreatment" => []
             ];
+
+            // NEW FIX: Codes Repeater for the Main Condition
+            $condition_codes = get_field('codes', $post_id);
+            if ( is_array($condition_codes) ) {
+                foreach ( $condition_codes as $code_row ) {
+                    if ( !empty($code_row['icd-10']) ) {
+                        $condition_node["code"][] = ["@type" => "MedicalCode", "codeValue" => trim($code_row['icd-10']), "codingSystem" => "ICD-10-CM"];
+                    }
+                    if ( !empty($code_row['snowmed']) ) {
+                        $condition_node["code"][] = ["@type" => "MedicalCode", "codeValue" => trim($code_row['snowmed']), "codingSystem" => "SNOMED-CT"];
+                    }
+                }
+            }
 
             // 2. Parent Backlink Logic
             $parent_id = get_field('parent_condition', $post_id);
@@ -228,7 +258,7 @@ function gd_inject_eeat_schema() {
             $treatment_schema["mainEntity"][] = $condition_node;
         }
 
-// --- SHARED PROVIDERS BLOCK (Preserved)
+// --- SHARED PROVIDERS BLOCK ---
         $treatment_schema["provider"][] = ["@type" => $entity_type, "@id" => $clinic_id];
 
         if ( is_array($linked_providers) ) {
@@ -246,7 +276,7 @@ function gd_inject_eeat_schema() {
         echo "\n<script type='application/ld+json'>" . json_encode($treatment_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 
- // --- PROTECTED PROVIDER PAGES (Team) (Preserved)
+ // --- PROTECTED PROVIDER PAGES (Team) ---
     if ( is_singular('team') ) {
         $p_type = get_field('provider_type', $post_id) ?: 'Person'; 
         $npi = get_field('provider_npi', $post_id);
@@ -272,7 +302,7 @@ function gd_inject_eeat_schema() {
         echo "\n<script type='application/ld+json'>" . json_encode(["@context" => "https://schema.org", "@graph" => [["@type" => "MedicalWebPage", "name" => get_the_title($post_id)], $provider_entity]], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "</script>\n";
     }
 
-    // --- 6. SATELLITE / GLOBAL CLINIC INJECTION (Preserved) ---
+    // --- 6. SATELLITE / GLOBAL CLINIC INJECTION ---
     if ( $current_page_location ) {
         $loc_id = get_home_url() . ($current_page_location['location_fragment'] ?: '#clinic');
         $is_primary_row = !empty($current_page_location['is_primary']);
